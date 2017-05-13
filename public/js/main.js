@@ -1,47 +1,56 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _three = require('three');
 
-var _player = require('./player');
+var THREE = _interopRequireWildcard(_three);
 
-var _player2 = _interopRequireDefault(_player);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var scene = new THREE.Scene();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+camera.position.z = 10;
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-var b = 1;
+var renderer = new THREE.WebGLRenderer({
+	alpha: true,
+	antialias: true
+});
 
-var Animal = function () {
-	function Animal(name) {
-		_classCallCheck(this, Animal);
+var container = document.getElementById('world');
+container.appendChild(renderer.domElement);
 
-		this.name = name;
-	}
+window.addEventListener('resize', onWindowResize, false);
+window.addEventListener('load', onWindowResize, false);
 
-	_createClass(Animal, [{
-		key: 'sayName',
-		value: function sayName() {
-			console.log(this.name);
-		}
-	}, {
-		key: 'sayNum',
-		value: function sayNum() {
-			return 3;
-		}
-	}]);
+function onWindowResize() {
+	var WIDTH = window.innerWidth;
+	var HEIGHT = window.innerHeight;
+	renderer.setSize(WIDTH, HEIGHT);
+	camera.aspect = WIDTH / HEIGHT;
+	camera.updateProjectionMatrix();
+}
 
-	return Animal;
-}();
+var light = new THREE.DirectionalLight(0xffffff);
+light.position.set(0, 0, 10);
 
-var cat = new Animal('cat');
-cat.sayName();
+var cube = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 
-var player = new _player2.default({ x: 1, y: 2, z: 3 }, 1);
-player.updatePosition();
-console.log('改变了！');
-console.log('改变了！');
-console.log('改变了！');
-console.log('改变了！');
-console.log('改变了！');
-console.log('改变了！');
+var axis = new THREE.AxisHelper(5);
+
+scene.add(cube);
+scene.add(axis);
+scene.add(light);
+
+animate();
+
+function animate() {
+	requestAnimationFrame(animate);
+	cube.rotation.x += Math.PI / 1200;
+	cube.rotation.y += Math.PI / 1200;
+	cube.rotation.z += Math.PI / 1200;
+	render();
+}
+function render() {
+	renderer.render(scene, camera);
+}

@@ -4,8 +4,26 @@
 		<meta charset="UTF-8">
 		<title></title>
 	</head>
+	<style>
+		html,body{
+			width:100%;
+			height:100%;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: lightgrey
+		}
+		#title{
+			position: absolute;
+			left: 10px;
+			top: 10px;
+			font-family: "微软雅黑";
+		}
+	</style>
 	<body>
-		<p>hello world!</p>
+		<p id="title">Shoo!</p>
+		<div id="world"></div>
+		
 		<script type="text/javascript" src="dist/bundle.js" ></script>
 	</body>
 </html>
