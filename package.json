@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "start": "./node_modules/.bin/babel-node app",
-    "build": "./node_modules/.bin/babel src --out-dir public/js",
     "dev": "./node_modules/.bin/nodemon --exec npm run start",
     "prd": "pm2 start bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,6 +24,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.4.0",
     "nodemon": "^1.8.1",
     "webpack": "^2.5.1"
