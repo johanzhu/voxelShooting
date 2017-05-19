@@ -11,10 +11,6 @@ class Player {
 	}
 	
 	
-	sayHi(name) {
-		console.log(`I'm player${this.id},position:${this.position}`);
-	}
-	
 }
 
 export default Player;

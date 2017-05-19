@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -43764,65 +43764,71 @@ var _player = __webpack_require__(2);
 
 var _player2 = _interopRequireDefault(_player);
 
+var _world = __webpack_require__(3);
+
+var _world2 = _interopRequireDefault(_world);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var scene = new THREE.Scene();
+var world;
 
-var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-camera.position.z = 20;
-camera.lookAt(new THREE.Vector3(0, 0, 0));
+initWorld();
 
-var renderer = new THREE.WebGLRenderer({
-	alpha: true,
-	antialias: true
-});
+var player = new _player2.default(0, { x: 0, y: 0 });
 
-var container = document.getElementById('world');
-container.appendChild(renderer.domElement);
+world.scene.add(player.mesh);
 
-window.addEventListener('resize', onWindowResize, false);
-window.addEventListener('load', onWindowResize, false);
-
-function onWindowResize() {
-	var WIDTH = window.innerWidth;
-	var HEIGHT = window.innerHeight;
-	renderer.setSize(WIDTH, HEIGHT);
-	camera.aspect = WIDTH / HEIGHT;
-	camera.updateProjectionMatrix();
-}
-
-var light = new THREE.DirectionalLight(0xffffff);
-light.position.set(0, 0, 20);
-
-var cube = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3), new THREE.MeshPhongMaterial({ color: 0xff0ff0 }));
-
-var player = new _player2.default(1, 2);
-
-var axis = new THREE.AxisHelper(5);
-
-scene.add(cube);
-scene.add(axis);
-scene.add(light);
-scene.add(player.mesh);
-player.sayHi();
 animate();
 
-function animate() {
-	requestAnimationFrame(animate);
-	cube.rotation.x += Math.PI / 1200;
-	cube.rotation.y += Math.PI / 1200;
-	cube.rotation.z += Math.PI / 1200;
-	player.mesh.rotation.y += Math.PI / 600;
-	render();
+function initWorld() {
+
+	world = new _world2.default();
+
+	world.init();
+
+	world.removeAxis();
 }
-function render() {
-	renderer.render(scene, camera);
+
+function animate() {
+
+	requestAnimationFrame(animate);
+
+	world.render();
 }
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _three = __webpack_require__(0);
+
+var THREE = _interopRequireWildcard(_three);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Player = function Player(id, position) {
+	_classCallCheck(this, Player);
+
+	this.id = id;
+	this.position = position;
+	this.mesh = new THREE.Mesh(new THREE.SphereGeometry(3), new THREE.MeshPhongMaterial({ color: 0xf01f01, wireframe: true }));
+};
+
+exports.default = Player;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43842,29 +43848,80 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Player = function () {
-	function Player(id, position) {
-		_classCallCheck(this, Player);
+var World = function () {
+	function World(scene, camera) {
+		_classCallCheck(this, World);
 
-		this.id = id;
-		this.position = position;
-		this.mesh = new THREE.Mesh(new THREE.SphereGeometry(3), new THREE.MeshPhongMaterial({ color: 0xf01f01, wireframe: true }));
+		if (scene && scene instanceof THREE.Scene) this.scene = scene;else this.scene = new THREE.Scene();
+		if (camera && camera instanceof THREE.Camera) this.camera = camera;else this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
 	}
 
-	_createClass(Player, [{
-		key: 'sayHi',
-		value: function sayHi(name) {
-			console.log('I\'m player' + this.id + ',position:' + this.position);
+	_createClass(World, [{
+		key: 'init',
+		value: function init() {
+			var that = this;
+
+			var world = document.createElement('div');
+			world.setAttribute('id', 'world');
+			document.body.appendChild(world);
+
+			this.camera.position.set(-5, 10, 45);
+			this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+			this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+			this.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.renderer.setPixelRatio(1.5);
+			this.renderer.shadowMap.enabled = true;
+
+			var container = document.getElementById('world');
+			container.appendChild(this.renderer.domElement);
+
+			window.addEventListener('resize', onWindowResize, false);
+			window.addEventListener('load', onWindowResize, false);
+
+			function onWindowResize() {
+				var WIDTH = window.innerWidth;
+				var HEIGHT = window.innerHeight;
+				that.renderer.setSize(WIDTH, HEIGHT);
+				that.camera.aspect = WIDTH / HEIGHT;
+				that.camera.updateProjectionMatrix();
+			}
+
+			this.axis = new THREE.AxisHelper(10);
+			this.scene.add(this.axis);
+			this.ambient = new THREE.AmbientLight(0x444444);
+			this.scene.add(this.ambient);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			this.renderer.render(this.scene, this.camera);
+		}
+	}, {
+		key: 'removeAxis',
+		value: function removeAxis() {
+			this.scene.remove(this.axis);
+		}
+	}, {
+		key: 'changeScene',
+		value: function changeScene(scene, camera) {
+			this.scene = scene;
+			this.camera = camera;
+			var WIDTH = window.innerWidth;
+			var HEIGHT = window.innerHeight;
+			this.renderer.setSize(WIDTH, HEIGHT);
+			this.camera.aspect = WIDTH / HEIGHT;
+			this.camera.updateProjectionMatrix();
 		}
 	}]);
 
-	return Player;
+	return World;
 }();
 
-exports.default = Player;
+exports.default = World;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(1);
