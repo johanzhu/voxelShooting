@@ -1,4 +1,6 @@
 var path = require('path');
+var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   target: 'node',
   entry: [
@@ -6,8 +8,22 @@ module.exports = {
   ],
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname + '/public/dist')
+    path: path.resolve(__dirname + '/public/dist'),
+    publicPath: '/'
   },
+  resolve: {
+        alias: {
+            assets: path.resolve(__dirname, 'public')
+        }
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname + '/views/index.html'),
+      inject: 'body',
+      filename: 'index.html'
+    }),
+  ],
   module: {
   rules: [
     {

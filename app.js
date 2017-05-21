@@ -9,6 +9,30 @@ const logger = require('koa-logger');
 const index = require('./routes/index');
 const users = require('./routes/users');
 
+import webpackDevMiddleware from 'koa-webpack-dev-middleware';
+import webpackHotMiddleware from 'koa-webpack-hot-middleware';
+
+const convert = require('koa-convert');
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config');
+const compiler = webpack(webpackConfig);
+
+
+app.use( convert(webpackDevMiddleware( compiler, {
+	publicPath: webpackConfig.output.publicPath,
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    stats: {
+      colors: true,
+      hash: false,
+      timings: true,
+      chunks: false,
+      chunkModules: false,
+      modules: false
+    }
+})));
+
+app.use( convert(webpackHotMiddleware( compiler ) ));
+
 // error handler
 onerror(app);
 
