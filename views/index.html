@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
+		<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" />
 	</head>
 	<style>
 		html,body{
@@ -11,18 +12,63 @@
 			margin: 0;
 			padding: 0;
 			overflow: hidden;
-			background-color: lightgrey
+			background-color: #d2d2d2;
 		}
 		#title{
 			position: absolute;
-			left: 10px;
-			top: 10px;
+			top: 60px;
 			font-family: "微软雅黑";
+			color: #444444;
+			font-size: 25px;
+			white-space: nowrap;
+			width: 100%;
+			text-align: center;
+			left: 0;
+			display: none;
+		}
+		#yes{
+			position: absolute;
+			top: 110%;
+			left: 50%;
+			content: 'Yes';
+			font-size: 25px;
+			color:green;
+			border: 2px dimgray solid;
+			width: auto;
+			padding: 0 10px 3px 10px;
+			border-radius: 10px;
+			margin-left: -32.43px;
+			display: none;
+		}
+		#yes:hover{
+			background-color: white;
+			cursor: pointer;
+		}
+		#loading{
+			position: absolute;
+			width: 200px;
+			top: 50%;
+			left: 50%;
+			color: #444444;
+			font-size: 40px;
+			margin: -41px 0 0 -100px;
+			text-align: center;
+		}
+		#loadingBar{
+			width: 0;
+			height: 20px;
+			background-color: #FFFFFF;
+			margin-top: 10px;
+		}
+		#world{
+			display: none;
 		}
 	</style>
 	<body>
-		<p id="title">Shoo00000000000000!</p>
-		<div id="world"></div>
-		
+		<div id="loading">
+			Loading..
+			<div id="loadingBar">
+			</div>
+		</div>
 	</body>
 </html>

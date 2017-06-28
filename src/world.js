@@ -6,10 +6,13 @@ class World {
 			this.scene = scene;
 		else
 			this.scene = new THREE.Scene();
-		if(camera && camera instanceof THREE.Camera)
+		if(camera && camera instanceof THREE.Camera) {
 			this.camera = camera;
-		else 
+		}else{
 			this.camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
+			this.camera.position.set(0,0,100);
+			this.camera.lookAt(new THREE.Vector3(0,0,0));
+		}
 	}
 	
 	init() {
@@ -19,13 +22,11 @@ class World {
 		world.setAttribute('id','world');
 		document.body.appendChild(world);
 	
-   		this.camera.position.set(-5,10,45);
-		this.camera.lookAt(new THREE.Vector3(0,0,0));
-		
 		this.renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
 		this.renderer.setSize(window.innerWidth,window.innerHeight);
 		this.renderer.setPixelRatio(1.5);
 		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	
 		var container =  document.getElementById('world');
 		container.appendChild(this.renderer.domElement);
