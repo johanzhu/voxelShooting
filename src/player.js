@@ -28,9 +28,9 @@ class Player {
 		
 		this.camera  = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
 		this.characterPos = {
-			x : this.character.mesh.skeleton.bones[0].position.x + this.position.x,
-			y : this.character.mesh.skeleton.bones[0].position.y + this.position.y,
-			z : this.character.mesh.skeleton.bones[0].position.z + this.position.z,
+			x : this.character.mesh.position.x,
+			y : this.character.mesh.position.y,
+			z : this.character.mesh.position.z,
 		};
 		this.camera.position.set(
 			this.characterPos.x,
@@ -50,6 +50,11 @@ class Player {
 	
 	animate() {
 		this.character.animate();
+		this.characterPos = {
+			x : this.character.mesh.position.x,
+			y : this.character.mesh.position.y,
+			z : this.character.mesh.position.z,
+		};
 		this.camera.position.set(
 			this.characterPos.x,
 			this.characterPos.y + 0.5,

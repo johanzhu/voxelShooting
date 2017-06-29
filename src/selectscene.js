@@ -125,6 +125,11 @@ class SelectScene extends THREE.Scene {
 				Emitter.emit('gamestart');
 				title.style.display = 'none';
 			}
+			yes.ontouchstart = function() {
+				console.log('pass this data to server and save it.');
+				Emitter.emit('gamestart');
+				title.style.display = 'none';
+			}
 		}
 		
 	}

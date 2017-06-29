@@ -38,6 +38,9 @@ class Stick {
 	    attackBtn.onclick = function() {
 	    	Emitter.emit('attack');
 	    }
+	    attackBtn.ontouchstart = function() {
+	    	Emitter.emit('attack');
+	    }
 	    
 	}
 }

@@ -161,6 +161,8 @@
 		
 		gameScene && gameScene.animate();
 		
+		
+		
 	}
 	
 	

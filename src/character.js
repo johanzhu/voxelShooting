@@ -30,6 +30,10 @@ class Character {
 		
 		this.angle = null;
 		
+		this._$run = false;
+		
+		
+		
 	}
 	
 	attack() {
@@ -37,39 +41,28 @@ class Character {
 		this._attack.play();
 		this._attack.crossFadeFrom(this._idle,0.3,true);
 		this.mixer.addEventListener('finished',() => {
-			this._attack.crossFadeTo(this._idle,0.15,true);
+			if(this._$run) { 
+				this._attack.crossFadeTo(this._run,0.15,true);
+				this._run.play();
+			}else{	
+				this._attack.crossFadeTo(this._idle,0.15,true);
+				this._idle.play();
+			}
+			//shoot bullet
 		});
 	}
 	
 	idle() {
 		this.reset();
 		this._idle.play();
-		for(let i = 0; i < 10; i++) {
-			window.clearInterval(i);
-		}
+		this._$run = false;
 	}
 	
 	run(data) {
 		const scope = this;
 		this.reset();
 		this._run.play();
-		
-		window.setInterval(move,167,this.deg);
-		
-		function move(deg){
-			if(!isNaN(deg)) {
-				const movingStep = 0.001;
-				console.log(movingStep * Math.cos(toRad(deg - 270)));
-				scope.mesh.position.x += movingStep * Math.cos(toRad(deg - 270));
-				scope.mesh.position.z += movingStep * Math.sin(toRad(deg - 270));
-			}
-		}
-		
-		this.move = move;
-		
-		function toRad(deg){
-			return (deg/180)*Math.PI;
-		}
+		this._$run = true;	
 	}
 	
 	
@@ -99,6 +92,14 @@ class Character {
 	
 	animate() {
 		this.mixer.update(this.clock.delta);
+		if(this._$run) {
+			const movingStep = 0.003;
+			this.mesh.position.x += movingStep * Math.cos(toRad(this.deg));
+			this.mesh.position.z -= movingStep * Math.sin(toRad(this.deg));
+		}
+		function toRad(deg){
+			return (deg/180) * Math.PI;
+		}
 	}
 	
 }
