@@ -49,10 +49,10 @@ class SelectScene extends THREE.Scene {
 		
 		//add stage
 		const stage = new Stage(0xffffff);
-		stage.mesh.position.y = -0.2;
+		stage.position.y = -0.2;
 		stage.material.transparent = true;
 		stage.material.opacity = 0.2;
-		this.add(stage.mesh);
+		this.add(stage);
 		//add light
 		const ambient = new THREE.AmbientLight(0X222222);
 		this.add(ambient);

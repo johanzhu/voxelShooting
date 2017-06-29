@@ -8,6 +8,7 @@
 	import Util from './util';
 	import SelectScene from './selectscene';
 	import GameScene from './gamescene';
+	import Stick from './stick';
 	
 	
 	var world,
@@ -16,14 +17,6 @@
 	const preloader = new createjs.LoadQueue(true);
 	
 	loadAssets();
-	
-	const data = {
-		id : 1,
-		position: {x:0,y:0,z:0},
-		hp:5,
-		hpMax:10
-	}
-	
 	
 	function onComplete() {
 		
@@ -88,15 +81,49 @@
 		console.log('start!');
 		gameScene = new GameScene(preloader);
 		gameScene.init();
-		//const camera = gameScene.player.camera;
-		const camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
-		camera.position.set(0,0,1);
 		
 		selectScene.dispose(world);
-		world.changeScene(gameScene,camera);
+		
+		//change gb color to be same with the stage
+		const bg = document.getElementById('world');
+		bg.style.backgroundColor = '#D6D6D6';
+		
+		//change scene
+		world.changeScene(gameScene,gameScene.camera);
+		
+		const stick = new Stick();
+		stick.init();
+		
+		gameScene.addPlayer(world);
+		
+		Emitter.on('run',playerRun);
+		
+		Emitter.on('idle',playerIdle);
+		
+		Emitter.on('attack',playerAttack);
+		
+		Emitter.on('rotate',playerRotate);
+		
+		function playerRun(data) {
+			//gameScene.yourPlayer.run();
+			gameScene.testPlayer.character.run(data);
+		}
+		
+		function playerRotate(data) {
+			//gameScene.yourPlayer.move();
+			gameScene.testPlayer.character.rotate(data);
+		}
 		
 		
+		function playerIdle() {
+			//gameScene.yourPlayer.idle();
+			gameScene.testPlayer.character.idle();
+		}
 		
+		function playerAttack() {
+			//gameScene.yourPlayer.attack();
+			gameScene.testPlayer.character.attack();
+		}
 		
 	}
 	

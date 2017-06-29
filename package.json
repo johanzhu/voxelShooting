@@ -32,6 +32,7 @@
     "koa-convert": "^1.2.0",
     "koa-webpack-dev-middleware": "^1.4.6",
     "koa-webpack-hot-middleware": "^1.0.3",
+    "nipplejs": "^0.6.7",
     "nodemon": "^1.8.1",
     "webpack": "^2.5.1"
   }

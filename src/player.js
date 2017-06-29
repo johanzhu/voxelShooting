@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Character from './character';
+import Util from './util';
 
 class Player {
 	constructor(data,preloader,characterName){
@@ -25,6 +26,19 @@ class Player {
 			}
 		})();
 		
+		this.camera  = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
+		this.characterPos = {
+			x : this.character.mesh.skeleton.bones[0].position.x + this.position.x,
+			y : this.character.mesh.skeleton.bones[0].position.y + this.position.y,
+			z : this.character.mesh.skeleton.bones[0].position.z + this.position.z,
+		};
+		this.camera.position.set(
+			this.characterPos.x,
+			this.characterPos.y + 0.3,
+			this.characterPos.z + 5,
+		);
+		this.camera.lookAt(this.characterPos);
+		
 	}
 	
 	addToScene(world) {
@@ -36,6 +50,16 @@ class Player {
 	
 	animate() {
 		this.character.animate();
+		this.camera.position.set(
+			this.characterPos.x,
+			this.characterPos.y + 0.5,
+			this.characterPos.z + 1,
+		);
+		this.camera.lookAt(this.characterPos);
+	}
+	
+	dispose() {
+		Util.disposeHierarchy(this.character.mesh);
 	}
 	
 	
