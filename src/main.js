@@ -10,10 +10,12 @@
 	import GameScene from './gamescene';
 	import Stick from './stick';
 	
-	
 	var world,
 		selectScene,
 		gameScene;
+		
+	const server = io.connect('http://192.168.1.40:3000/');
+		
 	const preloader = new createjs.LoadQueue(true);
 	
 	loadAssets();
@@ -64,7 +66,7 @@
 		camera.position.set(0,0,1);
 		
 		world.changeScene(selectScene,camera);
-		selectScene.addEvent(world);
+		selectScene.addEvent(world,server);
 		
 		//add light
 		const light = new THREE.DirectionalLight();
@@ -78,7 +80,7 @@
 	}
 	
 	function initGameScene() {
-		console.log('start!');
+		
 		gameScene = new GameScene(preloader);
 		gameScene.init();
 		
@@ -90,6 +92,7 @@
 		
 		//change scene
 		world.changeScene(gameScene,gameScene.camera);
+		gameScene.addPlayer(world,preloader,server);
 		
 		const stick = new Stick();
 		stick.init();
@@ -105,24 +108,20 @@
 		Emitter.on('rotate',playerRotate);
 		
 		function playerRun(data) {
-			//gameScene.yourPlayer.run();
-			gameScene.testPlayer.character.run(data);
+			gameScene.yourPlayer.character.run(data);
 		}
 		
 		function playerRotate(data) {
-			//gameScene.yourPlayer.move();
-			gameScene.testPlayer.character.rotate(data);
+			gameScene.yourPlayer.character.rotate(data);
 		}
 		
 		
 		function playerIdle() {
-			//gameScene.yourPlayer.idle();
-			gameScene.testPlayer.character.idle();
+			gameScene.yourPlayer.character.idle();
 		}
 		
 		function playerAttack() {
-			//gameScene.yourPlayer.attack();
-			gameScene.testPlayer.character.attack();
+			gameScene.yourPlayer.character.attack();
 		}
 		
 	}

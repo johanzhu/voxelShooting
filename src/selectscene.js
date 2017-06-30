@@ -65,7 +65,7 @@ class SelectScene extends THREE.Scene {
 		
 	}
 	
-	addEvent(world) {
+	addEvent(world,server) {
 		const scope = this;
 		this.event = new Util.event(world.scene,world.camera);
 		this.event.on('click', this.raby.mesh, chooseRaby);
@@ -84,7 +84,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.raby.dance();
 			changeTitle(
-				'黑白兔Raby，能够隐身.确定选择她吗？<div id="yes">yes</div>'
+				'黑白兔Raby，能够隐身.确定选择她吗？<div id="yes">yes</div>','raby'
 			)
 		}
 		function chooseRobo() {
@@ -93,7 +93,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.robo.dance();
 			changeTitle(
-				'机器人Roby,能够连续发射子弹.确定选择他吗？<div id="yes">yes</div>'
+				'机器人Roby,能够连续发射子弹.确定选择他吗？<div id="yes">yes</div>','robo'
 			)
 		}
 		function chooseRose() {
@@ -102,7 +102,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.rose.dance();
 			changeTitle(
-				'少女Rose,能够发射散弹.确定选择她吗？<div id="yes">yes</div>'
+				'少女Rose,能够发射散弹.确定选择她吗？<div id="yes">yes</div>','rose'
 			)
 		}
 		function chooseBoy() {
@@ -111,24 +111,24 @@ class SelectScene extends THREE.Scene {
 			scope.robo.idle();
 			scope.boy.dance();
 			changeTitle(
-				'少年Bob,能够致盲敌人.确定选择他吗？<div id="yes">yes</div>'
+				'少年Bob,能够致盲敌人.确定选择他吗？<div id="yes">yes</div>','boy'
 			)
 		}
 		
-		function changeTitle(characterInfo) {
+		function changeTitle(characterInfo,characterName) {
 			const title = document.getElementById('title');
 			title.innerHTML = characterInfo;
 			const yes = document.getElementById('yes');
 			yes.style.display = 'block';
 			yes.onclick = function() {
-				console.log('pass this data to server and save it.');
-				Emitter.emit('gamestart');
 				title.style.display = 'none';
+				Emitter.emit('gamestart');
+				Emitter.emit('getCharacterName',characterName);
 			}
 			yes.ontouchstart = function() {
-				console.log('pass this data to server and save it.');
-				Emitter.emit('gamestart');
 				title.style.display = 'none';
+				Emitter.emit('gamestart');
+				Emitter.emit('getCharacterName',characterName);
 			}
 		}
 		

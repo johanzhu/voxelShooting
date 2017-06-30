@@ -34,6 +34,7 @@
     "koa-webpack-hot-middleware": "^1.0.3",
     "nipplejs": "^0.6.7",
     "nodemon": "^1.8.1",
+    "socket.io": "^2.0.3",
     "webpack": "^2.5.1"
   }
 }

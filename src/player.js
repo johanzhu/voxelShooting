@@ -5,10 +5,8 @@ import Util from './util';
 class Player {
 	constructor(data,preloader,characterName){
 		this.id = data.id;
-		this.position = data.position;
-		
-		this.hp = data.hp;
-		this.hpMax = data.hpMax;
+		this.hp = data.player.hp
+		this.hpMax = data.player.hpMax;
 		
 		this.character = (function() {
 			switch(characterName) {
@@ -34,8 +32,8 @@ class Player {
 		};
 		this.camera.position.set(
 			this.characterPos.x,
-			this.characterPos.y + 0.3,
-			this.characterPos.z + 5,
+			this.characterPos.y + 0.8,
+			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);
 		
@@ -57,7 +55,7 @@ class Player {
 		};
 		this.camera.position.set(
 			this.characterPos.x,
-			this.characterPos.y + 0.5,
+			this.characterPos.y + 0.8,
 			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);

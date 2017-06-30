@@ -32,19 +32,21 @@ class Character {
 		
 		this._$run = false;
 		
-		
+		this._$attack = false;
 		
 	}
 	
 	attack() {
 		this.reset();
+		this._$attack = true;
 		this._attack.play();
-		this._attack.crossFadeFrom(this._idle,0.3,true);
+		
 		this.mixer.addEventListener('finished',() => {
-			if(this._$run) { 
+			this._$attack = false;
+			if(this._$run) {
 				this._attack.crossFadeTo(this._run,0.15,true);
 				this._run.play();
-			}else{	
+			}else{
 				this._attack.crossFadeTo(this._idle,0.15,true);
 				this._idle.play();
 			}
@@ -59,10 +61,10 @@ class Character {
 	}
 	
 	run(data) {
-		const scope = this;
+		this._$attack = false;
+		this._$run = true;	
 		this.reset();
 		this._run.play();
-		this._$run = true;	
 	}
 	
 	
@@ -92,7 +94,7 @@ class Character {
 	
 	animate() {
 		this.mixer.update(this.clock.delta);
-		if(this._$run) {
+		if(this._$run && !this._$attack) {
 			const movingStep = 0.003;
 			this.mesh.position.x += movingStep * Math.cos(toRad(this.deg));
 			this.mesh.position.z -= movingStep * Math.sin(toRad(this.deg));

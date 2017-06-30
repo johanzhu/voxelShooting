@@ -1,16 +1,20 @@
 const Koa = require('koa');
-const app = new Koa();
+const app = require('koa')();
+const server = require('http').createServer(app.callback());
 const views = require('koa-views');
 const json = require('koa-json');
 const onerror = require('koa-onerror');
 const bodyparser = require('koa-bodyparser')();
 const logger = require('koa-logger');
+const io = require('socket.io')(server);
 
 const index = require('./routes/index');
 const users = require('./routes/users');
 
+
 import webpackDevMiddleware from 'koa-webpack-dev-middleware';
 import webpackHotMiddleware from 'koa-webpack-hot-middleware';
+import Player from './server/player';
 
 const convert = require('koa-convert');
 const webpack = require('webpack');
@@ -58,7 +62,42 @@ app.use(async (ctx, next) => {
 app.use(index.routes(), index.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
 
+//socket
+const CLIENT_LIST = {};
+
+const initPack = { player:[] };
+const removePack = { player:[] };
+
+var player;
+
+io.on('connection',function(client){
+	
+	console.log('socket connection!');
+	
+	client.id = Math.random();
+	
+	CLIENT_LIST[socket.id] = client;
+	
+	client.on('connect',function() {
+		player = new Player(client,initPack);
+		player.onConnect(client,player);
+	});
+	
+	client.on('disconnect',function(){
+		delete CLIENT_LIST[client.id];
+		player.onDisconnect(player,client,removePack);
+	});
+	
+});
 
 
-app.listen(3000);
-module.exports = app;
+
+
+
+
+
+
+
+// port
+server.listen(3000);
+module.exports = server;
