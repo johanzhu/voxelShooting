@@ -1,5 +1,5 @@
 const Koa = require('koa');
-const app = require('koa')();
+const app = new Koa();
 const server = require('http').createServer(app.callback());
 const views = require('koa-views');
 const json = require('koa-json');
@@ -63,29 +63,28 @@ app.use(index.routes(), index.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
 
 //socket
-const CLIENT_LIST = {};
+const SOCKET_LIST = {};
 
 const initPack = { player:[] };
 const removePack = { player:[] };
 
-var player;
-
-io.on('connection',function(client){
+io.on('connection',function(socket){
 	
 	console.log('socket connection!');
 	
-	client.id = Math.random();
+	socket.id = Math.random();
 	
-	CLIENT_LIST[socket.id] = client;
+	SOCKET_LIST[socket.id] = socket;
 	
-	client.on('connect',function() {
-		player = new Player(client,initPack);
-		player.onConnect(client,player);
+	socket.on('connect',function() {
+		player = new Player(socket,initPack);
+		player.onConnect(socket,player);
 	});
 	
-	client.on('disconnect',function(){
-		delete CLIENT_LIST[client.id];
-		player.onDisconnect(player,client,removePack);
+	socket.on('disconnect',function(){
+		
+		delete SOCKET_LIST[socket.id];
+		//player.onDisconnect(player,socket,removePack);
 	});
 	
 });

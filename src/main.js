@@ -14,7 +14,7 @@
 		selectScene,
 		gameScene;
 		
-	const server = io.connect('http://192.168.1.40:3000/');
+	const socket = io();
 		
 	const preloader = new createjs.LoadQueue(true);
 	
@@ -66,7 +66,7 @@
 		camera.position.set(0,0,1);
 		
 		world.changeScene(selectScene,camera);
-		selectScene.addEvent(world,server);
+		selectScene.addEvent(world,socket);
 		
 		//add light
 		const light = new THREE.DirectionalLight();
@@ -92,7 +92,7 @@
 		
 		//change scene
 		world.changeScene(gameScene,gameScene.camera);
-		gameScene.addPlayer(world,preloader,server);
+		gameScene.addPlayer(world,preloader,socket);
 		
 		const stick = new Stick();
 		stick.init();

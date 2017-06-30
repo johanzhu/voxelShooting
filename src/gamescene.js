@@ -36,11 +36,12 @@ class GameScene extends THREE.Scene {
 		
 	}
 	
-	addPlayer(world,preloader,server) {
+	addPlayer(world,preloader,socket) {
 		const scope = this;
+		console.log(socket);
 		Emitter.on('getCharacterName',function(characterName){
-			
-			server.on('init',function(data){
+			console.log(socket);
+			socket.on('init',function(data){
 				this.playerId = data.id;
 				this.camera = this.yourPlayer.camera;
 				world.changeScene(this,this.camera);
