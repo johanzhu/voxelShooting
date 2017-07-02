@@ -61,7 +61,7 @@
 	
 	function initSelectScene() {
 		selectScene = new SelectScene(preloader);
-		selectScene.init();
+		selectScene.init(socket);
 		const camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
 		camera.position.set(0,0,1);
 		
@@ -91,38 +91,13 @@
 		bg.style.backgroundColor = '#D6D6D6';
 		
 		//change scene
-		world.changeScene(gameScene,gameScene.camera);
-		gameScene.addPlayer(world,preloader,socket);
+		gameScene.showAndGenPlayer(world,preloader,socket);
 		
+		//init stick bar
 		const stick = new Stick();
-		stick.init();
+		stick.init(socket);
 		
-		gameScene.addPlayer(world);
-		
-		Emitter.on('run',playerRun);
-		
-		Emitter.on('idle',playerIdle);
-		
-		Emitter.on('attack',playerAttack);
-		
-		Emitter.on('rotate',playerRotate);
-		
-		function playerRun(data) {
-			gameScene.yourPlayer.character.run(data);
-		}
-		
-		function playerRotate(data) {
-			gameScene.yourPlayer.character.rotate(data);
-		}
-		
-		
-		function playerIdle() {
-			gameScene.yourPlayer.character.idle();
-		}
-		
-		function playerAttack() {
-			gameScene.yourPlayer.character.attack();
-		}
+		gameScene.updatePlayers(socket);
 		
 	}
 	

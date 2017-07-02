@@ -15,12 +15,11 @@ class Entity {
 	
 	updatePosition() {
 		//todo
-		console.log('entity 更新位置函数' + this.position);
 	}
 	
-	getDistance() {
+	getDistance(target) {
 		//todo
-		console.log('entity获取距离函数');
+		return Math.sqrt(Math.pow(this.x-target.x,2) + Math.pow(this.y-target.y,2));
 	}
 	
 }

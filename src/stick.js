@@ -6,7 +6,7 @@ class Stick {
 		
 	}
 	
-	init() {
+	init(socket) {
 		const stickzone = document.getElementById('stickzone');
 		const stick = nipplejs.create({
 			zone: stickzone,
@@ -24,23 +24,48 @@ class Stick {
 		
 		
 	    stick.on('start move', function (evt,data) {
-	    	Emitter.emit('rotate',data);
+	    	//when start touch the stick and move stick pass the angle to server and change player data
+	    	if(data.angle) {
+	    		socket.emit('rotate',data.angle.degree);
+	    	}
+	    	//change angle has nothing to do with character's action
 	    });
-	    stick.on('start', function (evt,data) {
-	    	Emitter.emit('run',data);
+	    
+	    stick.on('start', function (evt) {
+	    	//when start touch the stick , player is running
+	    	socket.emit('move');
+	    	
+	    	socket.emit('run',true);
+	    	socket.emit('idle',false);
+	    	socket.emit('attack',false);
 	    });
-	    stick.on('end', function (evt,data) {
-	    	Emitter.emit('idle');
+	    
+	    stick.on('end', function (evt) {
+	    	//when end touch ,player is idle
+	    	socket.emit('stop');
+	    	
+	    	socket.emit('idle',true);
+	    	socket.emit('run',false);
+	    	socket.emit('attack',false);
 	    });
 	    
 	    const attackBtn = document.getElementById('attack');
 	    attackBtn.style.display = 'block';
 	    attackBtn.onclick = function() {
-	    	Emitter.emit('attack');
+	    	socket.emit('stop');
+	    	
+	    	socket.emit('run',false);
+	    	socket.emit('idle',false);
+	    	socket.emit('attack',true);
 	    }
 	    attackBtn.ontouchstart = function() {
-	    	Emitter.emit('attack');
+	    	socket.emit('stop');
+	    	
+	    	socket.emit('run',false);
+	    	socket.emit('idle',false);
+	    	socket.emit('attack',true);
 	    }
+	    
 	    
 	}
 }

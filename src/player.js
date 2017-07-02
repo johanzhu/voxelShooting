@@ -3,32 +3,35 @@ import Character from './character';
 import Util from './util';
 
 class Player {
-	constructor(data,preloader,characterName){
+	constructor(data,preloader){
 		this.id = data.id;
-		this.hp = data.player.hp
-		this.hpMax = data.player.hpMax;
+		this.hp = data.hp
+		this.hpMax = data.hpMax;
+		this.position = data.position;
+		this.angle = data.angle;
+		this.characterName = data.characterName;
 		
-		this.character = (function() {
-			switch(characterName) {
+		this.character = (function(data) {
+			switch(data.characterName) {
 				case 'raby':
-				return new Character(preloader.getResult('raby')); 
+				return new Character(preloader.getResult('raby'),data,false);
 				break;
 				case 'robo':
-				return new Character(preloader.getResult('robo'));
+				return new Character(preloader.getResult('robo'),data,false);
 				break;
 				case 'rose':
-				return new Character(preloader.getResult('rose'));
+				return new Character(preloader.getResult('rose'),data,false);
 				break;
 				case 'boy':
-				return new Character(preloader.getResult('boy'));
+				return new Character(preloader.getResult('boy'),data,false);
 			}
-		})();
+		})(data);
 		
 		this.camera  = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
 		this.characterPos = {
-			x : this.character.mesh.position.x,
-			y : this.character.mesh.position.y,
-			z : this.character.mesh.position.z,
+			x : this.position.x,
+			y : this.position.y,
+			z : this.position.z,
 		};
 		this.camera.position.set(
 			this.characterPos.x,
@@ -46,12 +49,11 @@ class Player {
 		
 	}
 	
-	animate() {
-		this.character.animate();
+	animateCamera() {
 		this.characterPos = {
-			x : this.character.mesh.position.x,
-			y : this.character.mesh.position.y,
-			z : this.character.mesh.position.z,
+			x : this.position.x,
+			y : this.position.y,
+			z : this.position.z,
 		};
 		this.camera.position.set(
 			this.characterPos.x,
@@ -61,8 +63,9 @@ class Player {
 		this.camera.lookAt(this.characterPos);
 	}
 	
-	dispose() {
-		Util.disposeHierarchy(this.character.mesh);
+	animate(data) {
+		this.character.animate(data);
+		this.animateCamera();
 	}
 	
 	

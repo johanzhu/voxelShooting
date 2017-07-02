@@ -9,16 +9,16 @@ import Emitter from './emitter';
 class SelectScene extends THREE.Scene {
 	constructor(preloader) {
 		super();
-		this.raby = new Character(preloader.getResult('raby')); 
-		this.robo = new Character(preloader.getResult('robo'));
-		this.rose = new Character(preloader.getResult('rose')); 
-		this.boy = new Character(preloader.getResult('boy'));
+		this.raby = new Character(preloader.getResult('raby'),null,true); 
+		this.robo = new Character(preloader.getResult('robo'),null,true);
+		this.rose = new Character(preloader.getResult('rose'),null,true); 
+		this.boy = new Character(preloader.getResult('boy'),null,true);
 		this.characters = [this.raby,this.robo,this.rose,this.boy];
 		this.arrows = [new Arrow(),new Arrow(),new Arrow(),new Arrow()];
 		this.event = null;
 	}
 	
-	init() {
+	init(socket) {
 		for(let i = 0; i < 4; i++) {
 			const scope = this;
 			//add character
@@ -57,7 +57,7 @@ class SelectScene extends THREE.Scene {
 		const ambient = new THREE.AmbientLight(0X222222);
 		this.add(ambient);
 		
-		this.initUI();
+		this.initUI(socket);
 		
 		const title = document.getElementById('title');
 		title.style.display = 'block';
@@ -65,7 +65,7 @@ class SelectScene extends THREE.Scene {
 		
 	}
 	
-	addEvent(world,server) {
+	addEvent(world,socket) {
 		const scope = this;
 		this.event = new Util.event(world.scene,world.camera);
 		this.event.on('click', this.raby.mesh, chooseRaby);
@@ -84,7 +84,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.raby.dance();
 			changeTitle(
-				'黑白兔Raby，能够隐身.确定选择她吗？<div id="yes">yes</div>','raby'
+				'黑白兔Raby，能够隐身.确定选择她吗？','raby',socket
 			)
 		}
 		function chooseRobo() {
@@ -93,7 +93,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.robo.dance();
 			changeTitle(
-				'机器人Roby,能够连续发射子弹.确定选择他吗？<div id="yes">yes</div>','robo'
+				'机器人Roby,能够连续发射子弹.确定选择他吗？','robo',socket
 			)
 		}
 		function chooseRose() {
@@ -102,7 +102,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.rose.dance();
 			changeTitle(
-				'少女Rose,能够发射散弹.确定选择她吗？<div id="yes">yes</div>','rose'
+				'少女Rose,能够发射散弹.确定选择她吗？','rose',socket
 			)
 		}
 		function chooseBoy() {
@@ -111,30 +111,33 @@ class SelectScene extends THREE.Scene {
 			scope.robo.idle();
 			scope.boy.dance();
 			changeTitle(
-				'少年Bob,能够致盲敌人.确定选择他吗？<div id="yes">yes</div>','boy'
+				'少年Bob,能够致盲敌人.确定选择他吗？','boy',socket
 			)
 		}
 		
-		function changeTitle(characterInfo,characterName) {
+		function changeTitle(characterInfo,characterName,socket) {
 			const title = document.getElementById('title');
-			title.innerHTML = characterInfo;
+			title.childNodes[0].data = characterInfo;
 			const yes = document.getElementById('yes');
 			yes.style.display = 'block';
+			
 			yes.onclick = function() {
 				title.style.display = 'none';
 				Emitter.emit('gamestart');
 				Emitter.emit('getCharacterName',characterName);
+				socket.emit('addPlayer',characterName);
 			}
 			yes.ontouchstart = function() {
 				title.style.display = 'none';
 				Emitter.emit('gamestart');
 				Emitter.emit('getCharacterName',characterName);
+				socket.emit('addPlayer',characterName);
 			}
 		}
 		
 	}
 	
-	initUI() {
+	initUI(socket) {
 		
 		const title = document.createElement('div');
 		title.setAttribute('id','title');
@@ -144,7 +147,6 @@ class SelectScene extends THREE.Scene {
 		yes.setAttribute('id','yes');
 		yes.innerHTML = 'yes';
 		title.appendChild(yes);
-		
 	}
 	
 	animate() {

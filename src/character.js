@@ -3,7 +3,7 @@ import Clock from './clock';
 
 class Character {
 	
-	constructor(json) {
+	constructor(json,data,selectMode) {
 		this.loader = new THREE.JSONLoader();
 		this.modelFile = this.loader.parse(json,'/model/');
 		this.geometry = this.modelFile.geometry;
@@ -13,11 +13,14 @@ class Character {
 			this.geometry,
 			this.material
 		);
+		
+		if(data) this.mesh.name = data.characterName;
 		this.mesh.castShadow = true;
 		this.clock = new Clock(true);
 		
 		this.mixer = new THREE.AnimationMixer(this.mesh);
 		
+		//action 
 		this._attack = this.mixer.clipAction( this.geometry.animations[0] );
 		this._attack.setLoop( THREE.LoopOnce );
 		this._attack.clampWhenFinished = true;
@@ -28,50 +31,75 @@ class Character {
 		
 		this._dance = this.mixer.clipAction(this.geometry.animations[1]);
 		
-		this.angle = null;
+		//character action state
+		if(data) this.angle = data.angle;
 		
-		this._$run = false;
+		if(data) this._$run = data.run;
 		
-		this._$attack = false;
+		if(data) this._$attack = data.attack;
+		
+		if(data) this._$idle = data.idle;
+		
+		if(data) this.position = data.position;
+		
+		if(data) this.move = data.move;
+		
+		this.onSelect = selectMode;
 		
 	}
 	
 	attack() {
-		this.reset();
-		this._$attack = true;
-		this._attack.play();
-		
-		this.mixer.addEventListener('finished',() => {
-			this._$attack = false;
-			if(this._$run) {
-				this._attack.crossFadeTo(this._run,0.15,true);
-				this._run.play();
-			}else{
-				this._attack.crossFadeTo(this._idle,0.15,true);
-				this._idle.play();
-			}
-			//shoot bullet
-		});
+		//get action state from server
+		if(this._$attack) {
+			
+			this.reset();
+			
+			this._attack.play();
+			
+			//fade the action
+			this.mixer.addEventListener('finished',() => {
+				this._$attack = false;
+				if(this._$run) {
+					this._attack.crossFadeTo(this._run,0.15,true);
+					this._run.play();
+				}else{
+					this._attack.crossFadeTo(this._idle,0.15,true);
+					this._idle.play();
+				}
+				
+			//shoot bullet todo
+				//todo
+				
+			});
+		}
 	}
 	
 	idle() {
-		this.reset();
-		this._idle.play();
-		this._$run = false;
+		if(this.onSelect){
+			this.reset();
+			this._idle.play();
+		}
+		if(this._$idle) {
+			this.reset();
+			this._idle.play();
+		}
+		
 	}
 	
-	run(data) {
-		this._$attack = false;
-		this._$run = true;	
-		this.reset();
-		this._run.play();
+	run() {
+		
+		if(this._$run) {
+			this.reset();
+			this._run.play();
+		}
+		
 	}
-	
 	
 	dance() {
+		//dance action has nothing to do with the server
 		this.reset();
 		this._dance.play();
-		this._dance.crossFadeFrom(this._idle,0.3,true);
+		this._dance.crossFadeFrom(this._idle,0.15,true);
 	}
 	
 	reset() {
@@ -81,27 +109,31 @@ class Character {
     	}
 	}
 	
+	//character moving state
 	rotate(data) {
-		if(data.angle) {
-			let deg = data.angle.degree;
+		
+		const deg = data.angle;
+		if(deg == 0) {
+			this.mesh.rotation.y = 0;
+		}else{
 			this.mesh.rotation.y = toRad(deg - 270);
-			this.deg = deg;
 		}
+		
 		function toRad(deg){
 			return (deg/180)*Math.PI;
 		}
 	}
 	
+	updatePos(data) {
+		if(data.move) {
+			this.mesh.position.x = data.position.x;
+			this.mesh.position.z = data.position.z;
+		}
+	}
+	
+	//action animate
 	animate() {
 		this.mixer.update(this.clock.delta);
-		if(this._$run && !this._$attack) {
-			const movingStep = 0.003;
-			this.mesh.position.x += movingStep * Math.cos(toRad(this.deg));
-			this.mesh.position.z -= movingStep * Math.sin(toRad(this.deg));
-		}
-		function toRad(deg){
-			return (deg/180) * Math.PI;
-		}
 	}
 	
 }

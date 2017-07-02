@@ -66,7 +66,10 @@ app.use(users.routes(), users.allowedMethods());
 const SOCKET_LIST = {};
 
 const initPack = { player:[] };
+const updatePack = { player: [] };
 const removePack = { player:[] };
+
+const playerList = {};
 
 io.on('connection',function(socket){
 	
@@ -76,21 +79,31 @@ io.on('connection',function(socket){
 	
 	SOCKET_LIST[socket.id] = socket;
 	
-	socket.on('connect',function() {
-		player = new Player(socket,initPack);
-		player.onConnect(socket,player);
+	
+	socket.on('addPlayer',function(characterName) {
+		const player = new Player(socket,characterName);
+		playerList[socket.id] = player;
+		player.onConnect(socket,playerList);
 	});
 	
-	socket.on('disconnect',function(){
-		
-		delete SOCKET_LIST[socket.id];
-		//player.onDisconnect(player,socket,removePack);
-	});
+	
+	
+	
 	
 });
 
 
-
+//loop 
+setInterval(function() {
+	for(let i in playerList) {
+		playerList[i].update();
+	}
+	const updatePack = Player.getAllUpdatePack(playerList);
+	for(let i in SOCKET_LIST){
+		let socket = SOCKET_LIST[i];
+		socket.emit('update',updatePack);
+	}
+},1000/60);
 
 
 
