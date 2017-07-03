@@ -22,7 +22,7 @@ class Player extends Entity {
 	
 	updateSpd() {
 		const scope = this;
-		const movingStep = 0.03;
+		const movingStep = 0.015;
 		this.position.x += movingStep * Math.cos(toRad(scope.angle));
 		this.position.z -= movingStep * Math.sin(toRad(scope.angle));
 		function toRad(deg){
@@ -62,7 +62,7 @@ class Player extends Entity {
 		//todo
 	}
 	
-	getAllInitPack(playerList) {
+	static getAllInitPack(playerList) {
 		var players = [];
 		for(let i in playerList)
 			players.push(playerList[i].getInitPack());
@@ -106,10 +106,11 @@ class Player extends Entity {
 			console.log('gamestart');
 		});
 		
-		socket.emit('init',{
-			id: this.id,
-			player: this.getAllInitPack(playerList)
-		});
+		const initPack = Player.getAllInitPack(playerList);
+		socket.emit('init',
+			initPack,
+			socket.id
+		);
 		
 	}
 	

@@ -49,11 +49,11 @@ class Player {
 		
 	}
 	
-	animateCamera() {
+	animateCamera(data) {
 		this.characterPos = {
-			x : this.position.x,
-			y : this.position.y,
-			z : this.position.z,
+			x : data.position.x,
+			y : data.position.y,
+			z : data.position.z,
 		};
 		this.camera.position.set(
 			this.characterPos.x,
@@ -63,9 +63,8 @@ class Player {
 		this.camera.lookAt(this.characterPos);
 	}
 	
-	animate(data) {
-		this.character.animate(data);
-		this.animateCamera();
+	animate() {
+		this.character.animate();
 	}
 	
 	

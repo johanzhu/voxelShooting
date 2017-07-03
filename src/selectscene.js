@@ -124,13 +124,11 @@ class SelectScene extends THREE.Scene {
 			yes.onclick = function() {
 				title.style.display = 'none';
 				Emitter.emit('gamestart');
-				Emitter.emit('getCharacterName',characterName);
 				socket.emit('addPlayer',characterName);
 			}
 			yes.ontouchstart = function() {
 				title.style.display = 'none';
 				Emitter.emit('gamestart');
-				Emitter.emit('getCharacterName',characterName);
 				socket.emit('addPlayer',characterName);
 			}
 		}
