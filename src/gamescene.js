@@ -14,11 +14,13 @@ class GameScene extends THREE.Scene {
 		);
 		this.camera.lookAt(new THREE.Vector3(0,0,0));
 		this.players = {};
+		this.yourId = null;
 		this.yourPlayer = null;
-		this.newPackId = [];
-		this.oldPackId = [];
+		
 		this.oldPack = null;
 		this.newPack = null;
+		
+		this.firstInit = true;
 	}
 	
 	init() {
@@ -50,38 +52,33 @@ class GameScene extends THREE.Scene {
 			
 			if(id) {
 				
-				scope.oldPack = data;
-				
-				scope.oldPackId = getKeyArr(scope.oldPack);
-				
-				addModel(data);
-				
+				if(scope.firstInit) {
+					
+					console.log(id);
+					
+					scope.firstInit = false;
+					
+					scope.yourId = id;
+					
+					scope.oldPack = data;
+					
+					//第一次初始化
+					addModel(data);
+					
+				}
 				
 			}else{
 				
 				scope.newPack = data;
 				
-				scope.newPackId = getKeyArr(scope.newPack);
+				const filteredData = filterData(scope.newPack,scope.oldPack);
 				
-				if( scope.newPack  !== scope.oldPack  ) {
-					
-					const filteredData = filterData(scope.newPack,scope.oldPack);
-				
-					addModel(filteredData);
-					
-					scope.oldPack = scope.newPack;
-					
-				}else{
-					
-					console.log('居然一样了。。');
-					
-				}
-				
+				addModel(filteredData);
 				
 			}
 			
+			switchToPlayerCamera(scope.yourId);
 			
-					
 			function addModel(initPack) {
 				
 				if(initPack.length) {
@@ -99,7 +96,9 @@ class GameScene extends THREE.Scene {
 				}
 			}
 			
-			function getPlayerCamera() {
+		});
+		
+		function switchToPlayerCamera(id) {
 			
 				const yourId = id;
 				
@@ -108,36 +107,29 @@ class GameScene extends THREE.Scene {
 				scope.camera = scope.yourPlayer.camera;
 				
 			}	
-			
-		});
 		
-		function getKeyArr(obj) {
+		function filterData(newPack,oldPack) {
+			let result = {};
+			let oldPackId = getIdfromPack(oldPack);
+			let newPackId = getIdfromPack(newPack);
+			oldPackId.forEach((oldId) => {
+				for(let id in newPack) {
+					if(id !== oldId) {
+						result[id] = newPack[id];
+					}
+				}
+			});
+			
+			return result;
+		}
+		
+		function getIdfromPack(obj) {
 			let arr = [];
 			for(let i in obj) {
 				arr.push(obj[i].id);
 			}
 			arr.sort();
 			return arr;
-		}
-		
-		function filterData(newPack,oldPack) {
-			// 新的pack里面有更多的id和player
-			// 这个函数是从我们新的pack里面把老的pack的对应id的东西都删除掉那么我们可以遍历key？
-			let oldPackKey = [];
-			let result = {};
-			for(let i in oldPack) {
-				oldPackKey.push(Number(i));				
-			}
-			
-			for(let i in newPack) {
-				
-				let hasKeyInOldPack = oldPackKey.some((key) => i == key);
-				//不存在的话
-				if(!hasKeyInOldPack) result[i] = newPack[i]; 
-				
-			}
-			
-			return result;
 		}
 	
 	}

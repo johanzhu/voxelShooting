@@ -103,7 +103,9 @@ setInterval(function() {
 	const updatePack = Player.getAllUpdatePack(playerList);
 	for(let i in SOCKET_LIST){
 		let socket = SOCKET_LIST[i];
-		if(initPack.length) socket.emit('init',initPack);
+		if(initPack.length) {
+			socket.emit('init',initPack);
+		}
 		socket.emit('update',updatePack);
 	}
 },1000/60);

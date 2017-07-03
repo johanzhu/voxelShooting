@@ -34,14 +34,14 @@ class Player extends Entity {
 		return {
 			id : this.id,
 			characterName : this.characterName,
-			hpMax : this.hpMax,
-			position : this.position,
-			hp : this.hp,
-			move : this.move,
-			angle : this.angle,
-			attack :this.attack,
-			idle : this.idle,
-			run : this.run
+			hpMax : 100,
+			position : { x:0, y:0, z:0},
+			hp : 100,
+			move : false,
+			angle : 0,
+			attack :false,
+			idle : true,
+			run : false
 		}
 	}
 	
