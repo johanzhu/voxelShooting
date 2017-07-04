@@ -68,11 +68,11 @@ class GameScene extends THREE.Scene {
 				
 				if(scope.firstInit == false) {
 					
-					scope.instantPackId = getIdfromPack(data);
-					
-					scope.instantPack = data;
-					
 					if( scope.firstDif ) {
+						
+						scope.instantPackId = getIdfromPack(data);
+					
+						scope.instantPack = data;
 						
 						const newPack = scope.instantPack;
 						
@@ -87,6 +87,19 @@ class GameScene extends THREE.Scene {
 							
 						}
 							
+					}else{
+						//now it is not first dif, we store instantpack to for comparing
+						if(scope.instantPack.length !== data.length) {
+								//need update
+								const newPackId = getIdfromPack(data);
+								const oldPackId = getIdfromPack(scope.instantPack);
+								
+								const addData = getAddOrRemoveData(newPackId, oldPackId, data);
+								//const removeData = getAddOrRemoveData(oldPackId, newPackId, oldPack);
+								addModel(addData);					
+						}
+						
+						scope.instantPack = data;
 						
 					}
 				}
@@ -136,6 +149,33 @@ class GameScene extends THREE.Scene {
 					const player = new Player(initPack[i],preloader);
 					
 					scope.players[initPack[i].id] = player;
+					
+					player.character.rotate(initPack[i]);
+					//because move is false = = !so we should directly update position
+					player.character.mesh.position.x = initPack[i].position.x;
+					player.character.mesh.position.y = initPack[i].position.y;
+					player.character.mesh.position.z = initPack[i].position.z;
+					
+					player.character._$run = initPack[i].run;
+					player.character._$idle = initPack[i].idle;
+					player.character._$attack = initPack[i].attack;
+				
+					const isRun = player.character._$run;
+					const isIdle = player.character._$idle;
+					const isAttack = player.character._$attack;
+					
+					if(isRun)  {
+						player.character.run();
+						socket.emit('run',false);
+					}
+					if(isIdle) {
+						player.character.idle();
+						socket.emit('idle',false);
+					}
+					if(isAttack) {
+						player.character.attack();
+						socket.emit('attack',false);
+					}
 					
 					world.scene.add(player.character.mesh);
 					
