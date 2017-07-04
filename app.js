@@ -84,6 +84,7 @@ io.on('connection',function(socket){
 		const player = new Player(socket,characterName);
 		playerList[socket.id] = player;
 		player.onConnect(socket,playerList);
+		
 	});
 	
 	

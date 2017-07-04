@@ -17,10 +17,14 @@ class GameScene extends THREE.Scene {
 		this.yourId = null;
 		this.yourPlayer = null;
 		
-		this.oldPack = null;
-		this.newPack = null;
+		this.originPack = null;
+		this.orginPackId = [];
+		
+		this.instantPack = null;
+		this.instantPackId = [];
 		
 		this.firstInit = true;
+		this.firstDif = true;
 	}
 	
 	init() {
@@ -54,72 +58,130 @@ class GameScene extends THREE.Scene {
 				
 				if(scope.firstInit) {
 					
-					console.log(id);
+					firstInit(id,data);
 					
 					scope.firstInit = false;
-					
-					scope.yourId = id;
-					
-					scope.oldPack = data;
-					
-					//第一次初始化
-					addModel(data);
-					
+				
 				}
 				
 			}else{
 				
-				scope.newPack = data;
-				
-				const filteredData = filterData(scope.newPack,scope.oldPack);
-				
-				addModel(filteredData);
+				if(scope.firstInit == false) {
+					
+					scope.instantPackId = getIdfromPack(data);
+					
+					scope.instantPack = data;
+					
+					if( scope.firstDif ) {
+						
+						const newPack = scope.instantPack;
+						
+						const addData = getAddOrRemoveData(scope.instantPackId, scope.originPackId, newPack);
+						//const removeData = getAddOrRemoveData( scope.originPackId, scope.instantPackId, newPack);
+						
+						if(addData.length) {
+							
+							addModel(addData);
+							
+							scope.firstDif = false;
+							
+						}
+							
+						
+					}
+				}
 				
 			}
 			
 			switchToPlayerCamera(scope.yourId);
 			
-			function addModel(initPack) {
-				
-				if(initPack.length) {
-					
-					for(let i = 0; i < initPack.length; i++){
-					
-						const player = new Player(initPack[i],preloader);
-						
-						scope.players[initPack[i].id] = player;
-						
-						world.scene.add(player.character.mesh);
-						
-					}
-					
-				}
-			}
 			
 		});
 		
+		function firstInit(id,data) {
+				
+			console.log(id);
+			
+			scope.originPackId = getIdfromPack(data);
+			
+			console.log(scope.originPackId);
+			
+			scope.originPack = data;
+			
+			scope.yourId = id;
+			console.log(data);
+			
+			addModel(data);
+				
+		}
+		
+		function difPack(newPackId,oldPackId,newPack) {
+			
+			if(JSON.stringify(newPackId) == JSON.stringify(oldPackId)) {
+				//do nothing
+			}else{
+				
+				return filter(newPackId,oldPackId,newPack);
+				
+			}
+		}
+		
+		
+		function addModel(initPack) {
+				
+			if(initPack.length) {
+				
+				for(let i = 0; i < initPack.length; i++){
+				
+					const player = new Player(initPack[i],preloader);
+					
+					scope.players[initPack[i].id] = player;
+					
+					world.scene.add(player.character.mesh);
+					
+				}
+				
+			}
+		}
+		
+		
 		function switchToPlayerCamera(id) {
 			
-				const yourId = id;
+			const yourId = id;
+			
+			scope.yourPlayer = scope.players[yourId];
+					
+			if(scope.yourPlayer) scope.camera = scope.yourPlayer.camera;
 				
-				scope.yourPlayer = scope.players[yourId];
-						
-				scope.camera = scope.yourPlayer.camera;
-				
-			}	
+		}	
 		
-		function filterData(newPack,oldPack) {
-			let result = {};
-			let oldPackId = getIdfromPack(oldPack);
-			let newPackId = getIdfromPack(newPack);
-			oldPackId.forEach((oldId) => {
-				for(let id in newPack) {
-					if(id !== oldId) {
-						result[id] = newPack[id];
+		function getAddOrRemoveData(newPackId,oldPackId,newPack) {
+			//pass new first ,you get add id
+			//pass old first ,you get remove id
+			const result = [];
+			const newPackIdClone = newPackId.slice(0);
+			oldPackId.forEach((item) => {
+				for(let i = 0; i < newPackId.length; i ++) {
+					
+					if(newPackId[i] == item) {
+						newPackIdClone.splice(i,1,'');
 					}
 				}
 			});
+			const difId = [];
+			for(let i = 0; i < newPackIdClone.length; i++) {
+				if(newPackIdClone[i] !== '') {
+					difId.push(newPackIdClone[i]);
+				}
+			}
 			
+			difId.forEach((id) => {
+				for(let i in newPack) {
+					if(newPack[i].id == id) {
+						result.push(newPack[i]);
+					}
+				}
+			});
 			return result;
 		}
 		
@@ -153,7 +215,7 @@ class GameScene extends THREE.Scene {
 					character._$run = data[i].run;
 					character._$idle = data[i].idle;
 					character._$attack = data[i].attack;
-					
+				
 					const isRun = character._$run;
 					const isIdle = character._$idle;
 					const isAttack = character._$attack;
