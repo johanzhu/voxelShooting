@@ -84,10 +84,11 @@ io.on('connection',function(socket){
 		const player = new Player(socket,characterName);
 		playerList[socket.id] = player;
 		player.onConnect(socket,playerList);
-		
 	});
 	
-	
+	socket.on('disconnect',function() {
+		delete playerList[socket.id];
+	});
 	
 	
 	

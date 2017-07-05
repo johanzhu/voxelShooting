@@ -15,6 +15,7 @@ class Character {
 		);
 		
 		if(data) this.mesh.name = data.characterName;
+		if(data) this.mesh.userData.id = data.id;
 		this.mesh.castShadow = true;
 		this.clock = new Clock(true);
 		

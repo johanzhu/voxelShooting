@@ -114,12 +114,6 @@ class Player extends Entity {
 		
 	}
 	
-	onDisConnect(player,socket,removePack) {
-		delete player.list[socket.id];
-		removePack.player.push(socket.id);
-	
-	}
-	
 }
 
 

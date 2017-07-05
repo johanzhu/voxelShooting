@@ -9,7 +9,7 @@ class GameScene extends THREE.Scene {
 		this.camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
 		this.camera.position.set(
 			0,
-			0.8,
+			0.3,
 			1,
 		);
 		this.camera.lookAt(new THREE.Vector3(0,0,0));
@@ -22,6 +22,8 @@ class GameScene extends THREE.Scene {
 		
 		this.instantPack = null;
 		this.instantPackId = [];
+		
+		this.yourPack = null;
 		
 		this.firstInit = true;
 		this.firstDif = true;
@@ -75,17 +77,19 @@ class GameScene extends THREE.Scene {
 						scope.instantPack = data;
 						
 						const newPack = scope.instantPack;
+						const oldPack = scope.originPack;
 						
 						const addData = getAddOrRemoveData(scope.instantPackId, scope.originPackId, newPack);
-						//const removeData = getAddOrRemoveData( scope.originPackId, scope.instantPackId, newPack);
+						const removeData = getAddOrRemoveData( scope.originPackId, scope.instantPackId, oldPack);
 						
-						if(addData.length) {
+						if( addData.length || removeData.length) {
 							
-							addModel(addData);
+							if(addData.length) addModel(addData);
+							if(removeData.length) removeModel(removeData);
 							
 							scope.firstDif = false;
-							
 						}
+						
 							
 					}else{
 						//now it is not first dif, we store instantpack to for comparing
@@ -94,9 +98,18 @@ class GameScene extends THREE.Scene {
 								const newPackId = getIdfromPack(data);
 								const oldPackId = getIdfromPack(scope.instantPack);
 								
-								const addData = getAddOrRemoveData(newPackId, oldPackId, data);
-								//const removeData = getAddOrRemoveData(oldPackId, newPackId, oldPack);
-								addModel(addData);					
+								const newPack = data;
+								const oldPack = scope.instantPack;
+								
+								const addData = getAddOrRemoveData(newPackId, oldPackId, newPack);
+								const removeData = getAddOrRemoveData( oldPackId, newPackId, oldPack);
+								
+								if( addData.length || removeData.length) {
+									
+									if(addData.length) addModel(addData);
+									if(removeData.length) removeModel(removeData);
+								}	
+								
 						}
 						
 						scope.instantPack = data;
@@ -141,13 +154,12 @@ class GameScene extends THREE.Scene {
 		
 		
 		function addModel(initPack) {
-				
 			if(initPack.length) {
 				
 				for(let i = 0; i < initPack.length; i++){
 				
 					const player = new Player(initPack[i],preloader);
-					
+				
 					scope.players[initPack[i].id] = player;
 					
 					player.character.rotate(initPack[i]);
@@ -184,6 +196,21 @@ class GameScene extends THREE.Scene {
 			}
 		}
 		
+		function removeModel(initPack) {
+			if(initPack.length) {
+				for(let i = 0; i < initPack.length; i++){
+				
+					delete scope.players[initPack[i].id];
+					world.scene.children.forEach((model) => {
+						if(model instanceof THREE.SkinnedMesh) {
+							if(model.userData.id == initPack[i].id)
+							world.scene.remove(model);
+							Util.disposeNode(model);
+						}
+					});
+				}
+			}
+		}
 		
 		function switchToPlayerCamera(id) {
 			
@@ -192,7 +219,9 @@ class GameScene extends THREE.Scene {
 			scope.yourPlayer = scope.players[yourId];
 					
 			if(scope.yourPlayer) scope.camera = scope.yourPlayer.camera;
-				
+			
+			world.changeScene(scope,scope.camera);
+			
 		}	
 		
 		function getAddOrRemoveData(newPackId,oldPackId,newPack) {
@@ -239,10 +268,13 @@ class GameScene extends THREE.Scene {
 	updatePlayers(socket) {
 		const scope = this;
 		socket.on('update',(data) => {
+			
 			for(let i = 0; i < data.length; i++){
 				
 				const eachId = data[i].id;
-				
+				if(eachId == scope.yourId) {
+					scope.yourPack = data[i];
+				}
 				if(scope.players[eachId]) {
 					
 					const character = scope.players[eachId].character;
@@ -250,7 +282,6 @@ class GameScene extends THREE.Scene {
 				
 					character.rotate(data[i]);
 					character.updatePos(data[i]);
-					player.animateCamera(data[i]);
 									
 					character._$run = data[i].run;
 					character._$idle = data[i].idle;
@@ -274,8 +305,12 @@ class GameScene extends THREE.Scene {
 					}
 					
 				}
-				
 			}
+			
+			const yourPlayer = scope.players[scope.yourId];
+			const yourPack = scope.yourPack;
+			if(yourPack && yourPlayer) yourPlayer.animateCamera(yourPack);
+			
 			
 		});
 		
