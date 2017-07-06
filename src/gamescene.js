@@ -9,11 +9,13 @@ class GameScene extends THREE.Scene {
 		this.camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
 		this.camera.position.set(
 			0,
-			0.3,
+			0.8,
 			1,
 		);
 		this.camera.lookAt(new THREE.Vector3(0,0,0));
 		this.players = {};
+		this.bullets = {};
+		
 		this.yourId = null;
 		this.yourPlayer = null;
 		
@@ -185,7 +187,7 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						player.character.attack();
+						player.character.attack(initPack[i]);
 						socket.emit('attack',false);
 					}
 					
@@ -300,7 +302,7 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						character.attack();
+						character.attack(data[i]);
 						socket.emit('attack',false);
 					}
 					

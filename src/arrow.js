@@ -16,7 +16,7 @@ class Arrow extends THREE.Mesh{
 		  	bevelSegments: 3,
 		  	curveSegments: 12,
 		  	step: 1
-		  };
+		};
 		this.geometry = new THREE.ExtrudeGeometry(this.arrowShape,options);
 		this.material = new THREE.MeshLambertMaterial({color:0xffffff});
 		this.scale.set(0.01,0.01,0.01);

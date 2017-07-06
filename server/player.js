@@ -49,6 +49,7 @@ class Player extends Entity {
 		return {
 			id:this.id,
 			position : this.position,
+			characterName : this.characterName,
 			hp : this.hp,
 			angle : this.angle,
 			move : this.move,

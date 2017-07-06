@@ -24,6 +24,8 @@ class Player {
 				break;
 				case 'boy':
 				return new Character(preloader.getResult('boy'),data,false);
+				default:
+				break;
 			}
 		})(data);
 		

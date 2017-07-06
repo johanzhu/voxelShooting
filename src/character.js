@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import Clock from './clock';
+import Bullet from './bullet';
+import Util from './util';
 
 class Character {
 	
@@ -45,34 +47,72 @@ class Character {
 		
 		if(data) this.move = data.move;
 		
+		if(data) this.characterName = data.characterName;
+		
+		this.bullet = null;
+		
+		this.attackFinished = true;
+		this.attackDelay = 0;
+		
 		this.onSelect = selectMode;
 		
 	}
 	
-	attack() {
-		//get action state from server
+	attack(data) {
+		
 		if(this._$attack) {
-			
-			this.reset();
-			
-			this._attack.play();
-			
-			//fade the action
-			this.mixer.addEventListener('finished',() => {
-				this._$attack = false;
-				if(this._$run) {
-					this._attack.crossFadeTo(this._run,0.15,true);
-					this._run.play();
-				}else{
-					this._attack.crossFadeTo(this._idle,0.15,true);
-					this._idle.play();
+			if(this.attackFinished) {
+				//of course is finished . you are not attacking anyone;
+				this.reset();
+				
+				this._attack.play();
+				//when ation play attack not finish until ...
+				this.attackFinished = false;
+				
+				switch(data.characterName) {
+					case 'raby':
+					this.attackDelay = 500;
+					break;
+					case 'robo':
+					this.attackDelay = 0;
+					break;
+					case 'rose':
+					this.attackDelay = 500;
+					break;
+					case 'boy':
+					this.attackDelay = 500;
+					break;
 				}
+				setTimeout(() => {
+					this.shoot(data);
+				},this.attackDelay);
 				
-			//shoot bullet todo
-				//todo
-				
-			});
+				//fade the action
+				this.mixer.addEventListener('finished',() => {
+					
+					this.attackFinished = true;
+					if(this.bullet) {
+						this.mesh.remove(this.bullet);
+					}
+					
+					if(this._$run) {
+						this._attack.crossFadeTo(this._run,0.15,true);
+						this._run.play();
+					}else{
+						this._attack.crossFadeTo(this._idle,0.15,true);
+						this._idle.play();
+					}
+					
+				});
+			}
 		}
+	}
+	
+	shoot(data) {
+		const bullet = new Bullet(data);
+		this.bullet = bullet;
+		this.mesh.add(this.bullet);
+		bullet.animate();
 	}
 	
 	idle() {
@@ -88,12 +128,14 @@ class Character {
 	}
 	
 	run() {
-		
+		this.attackFinished = true;
+		if(this.bullet) {
+			this.mesh.remove(this.bullet);
+		}
 		if(this._$run) {
 			this.reset();
 			this._run.play();
 		}
-		
 	}
 	
 	dance() {
@@ -117,7 +159,7 @@ class Character {
 		if(deg == 0) {
 			this.mesh.rotation.y = 0;
 		}else{
-			this.mesh.rotation.y = toRad(deg - 270);
+			this.mesh.rotation.y = toRad(deg + 90);
 		}
 		
 		function toRad(deg){
