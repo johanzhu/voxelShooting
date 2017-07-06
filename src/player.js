@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import Character from './character';
 import Util from './util';
+import HPBar from './hpbar';
 
 class Player {
 	constructor(data,preloader){
@@ -41,14 +42,20 @@ class Player {
 			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);
-		
+		this.hpBar = new HPBar(this.hp,this.hpMax,this.id);
 	}
 	
 	addToScene(world) {
-		
 		this.character.mesh.position.set(this.position.x,this.position.y,this.position.z);
 		world.scene.add(this.character.mesh);
-		
+	}
+	
+	initHPBar(world) {
+		this.hpBar.init(this.position,world);
+	}
+	
+	updateHPBar(hp,position,world) {
+		this.hpBar.updateHp(hp,position,world);
 	}
 	
 	animateCamera(data) {

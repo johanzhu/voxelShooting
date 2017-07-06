@@ -132,8 +132,6 @@ class GameScene extends THREE.Scene {
 			
 			scope.originPackId = getIdfromPack(data);
 			
-			console.log(scope.originPackId);
-			
 			scope.originPack = data;
 			
 			scope.yourId = id;
@@ -164,6 +162,7 @@ class GameScene extends THREE.Scene {
 				
 					scope.players[initPack[i].id] = player;
 					
+					player.initHPBar(world);
 					player.character.rotate(initPack[i]);
 					//because move is false = = !so we should directly update position
 					player.character.mesh.position.x = initPack[i].position.x;
@@ -191,7 +190,7 @@ class GameScene extends THREE.Scene {
 						socket.emit('attack',false);
 					}
 					
-					world.scene.add(player.character.mesh);
+					player.addToScene(world);
 					
 				}
 				
@@ -201,7 +200,8 @@ class GameScene extends THREE.Scene {
 		function removeModel(initPack) {
 			if(initPack.length) {
 				for(let i = 0; i < initPack.length; i++){
-				
+					
+					scope.players[initPack[i].id].hpBar.dispose();
 					delete scope.players[initPack[i].id];
 					world.scene.children.forEach((model) => {
 						if(model instanceof THREE.SkinnedMesh) {

@@ -115,7 +115,7 @@ class Bullet extends THREE.Object3D {
 				this.update(0.3,0.22);
 			break;
 			case 'rose':
-				this.updateForRose(0.6,1.5)
+				this.updateForRose(0.6,1.2)
 			break;
 			case 'boy':
 				this.update(0.5,1.86,true);

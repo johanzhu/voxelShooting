@@ -169,14 +169,11 @@ THREE.util = {
 	/**
 	 * @param {Object} worldVector: Position vector of you object3D
 	 * @param {Object} camera: main camera
-	 * @param {Object} domElement : renderer.domElement
+	 * @param {Object} renderer : renderer
 	 */
 	toScreenXY : 
 	
-	function (worldVector,camera,renderer,domElement) {
-			
-		if(!THREE.Projector) console.error('This function relys on Project.js:https://github.com/mrdoob/three.js/blob/dev/examples/js/renderers/Projector.js');
-	    var projector = new THREE.Projector();
+	function (worldVector,camera,renderer) {
 	    var vector = worldVector.unproject(camera);
 	    var result = {};
 	    var halfWidth = renderer.domElement.width / 2;
