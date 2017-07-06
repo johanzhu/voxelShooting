@@ -49,6 +49,10 @@ class Character {
 		
 		if(data) this.characterName = data.characterName;
 		
+		if(data) this.hp = data.hp;
+		
+		if(data) this.hpMax = data.hpMax;
+		
 		this.bullet = null;
 		
 		this.attackFinished = true;
