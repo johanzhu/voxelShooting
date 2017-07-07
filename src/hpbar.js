@@ -1,51 +1,31 @@
-import Util from './util';
 import * as THREE from 'three';
-class HPBar {
-	constructor(hp,hpMax,id) {
+
+class HPBar extends THREE.Object3D{
+	constructor(hp,hpMax) {
+		super();
 		this.hp = hp;
 		this.hpMax = hpMax;
-		this.id = id.toString().slice(2);
-		this.playerHP = document.createElement('div');
-		this.playerHP.setAttribute('id',this.id);
-		this.playerHP.style.position = 'absolute';
-		this.playerHP.style.width = '50px';
-		this.playerHP.style.height = '10px';
-		this.playerHP.setAttribute('class','playerHP');
-		this.hpBox = document.createElement('div');
-		this.hpBox.setAttribute('class','hpBox');
-		this.hp = document.createElement('div');
-		this.hp.setAttribute('class','hp');
+		const box = new THREE.Geometry();
+		box.vertices.push(
+			new THREE.Vector3(-0.04,0.015),
+			new THREE.Vector3(0.04,0.015),
+			new THREE.Vector3(0.04,-0.015),
+			new THREE.Vector3(-0.04,-0.015)
+		);	
+		const lineMat = new THREE.LineBasicMaterial({color:0x000000});
+		this.hpBox = new THREE.LineLoop(box,lineMat);
+		this.hp = new THREE.Mesh(
+			new THREE.PlaneGeometry(0.079,0.029),
+			new THREE.MeshBasicMaterial({color:0xff0000,side:THREE.DoubleSide})
+		);
+		this.hp.scale.x = this.hp/this.hpMax;
+		this.add(this.hpBox);
+		this.add(this.hp);
 	}
 	
-	init(position,world) {
-		const vector = new THREE.Vector3(
-			position.x,
-			position.y,
-			position.z
-		);
-		const coord = Util.toScreenXY(vector,world.camera,world.renderer);
-		console.log(coord);
-		this.playerHP.style.left = coord.x + 'px';
-		this.playerHP.style.top = coord.y + 'px';
-		document.body.appendChild(this.playerHP);
-		this.playerHP.appendChild(this.hpBox);
-		this.hpBox.appendChild(this.hp);
-	}
-	updateHp(hp,position,world) {
-		const vector = new THREE.Vector3(
-			position.x,
-			position.y,
-			position.z
-		);
-		const coord = Util.toScreenXY(vector,world.camera,world.renderer);
-		console.log(coord);
-		this.playerHP.style.left = coord.x + 'px';
-		this.playerHP.style.top = coord.y + 'px';
-		this.playerHP.children[0].children[0].width = hp + 'px';
-	}
 	
-	dispose() {
-		document.body.removeChild(this.playerHP);
+	update(hp) {
+		this.hp.scale.x = hp/this.hpMax;
 	}
 	
 }

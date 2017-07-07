@@ -62,7 +62,7 @@ class Character {
 		
 	}
 	
-	attack(data) {
+	attack(data,world) {
 		
 		if(this._$attack) {
 			if(this.attackFinished) {
@@ -81,14 +81,14 @@ class Character {
 					this.attackDelay = 0;
 					break;
 					case 'rose':
-					this.attackDelay = 500;
+					this.attackDelay = 600;
 					break;
 					case 'boy':
 					this.attackDelay = 500;
 					break;
 				}
 				setTimeout(() => {
-					this.shoot(data);
+					this.shoot(data,world);
 				},this.attackDelay);
 				
 				//fade the action
@@ -112,11 +112,11 @@ class Character {
 		}
 	}
 	
-	shoot(data) {
+	shoot(data,world) {
 		const bullet = new Bullet(data);
 		this.bullet = bullet;
 		this.mesh.add(this.bullet);
-		bullet.animate();
+		bullet.animate(world);
 	}
 	
 	idle() {

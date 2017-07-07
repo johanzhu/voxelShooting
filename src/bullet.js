@@ -10,6 +10,7 @@ class Bullet extends THREE.Object3D {
 		//we dont need position here, because when you add bullet to character ,position of bullet set to 0 0 0
 		// so wo use relative coord to tween the position
 		//this.position = data.position;
+		this.pos = data.position;
 		this.angle = data.angle;
 		this.deg = 0;
 		switch(this.characterName) {
@@ -20,6 +21,11 @@ class Bullet extends THREE.Object3D {
 				);
 				rabyBullet.geometry.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI/4));
 				rabyBullet.position.set(-0.025,0.12,0.13);
+				const pos = new THREE.Vector3(this.pos.x,this.pos.y,this.pos.z);
+				console.log(pos);
+				this.raycaster = new THREE.Raycaster( pos.add(new THREE.Vector3(-0.025,0.12,0.13)) ,new THREE.Vector3(0,-1,0),0,0.025);
+				const arrowHelper = new THREE.ArrowHelper( new THREE.Vector3(0,0,1), new THREE.Vector3(0.025,0,0), 0.5, 0xff0000 );
+				rabyBullet.add( arrowHelper );
 				this.add(rabyBullet);
 				this.name = 'rabyBullet';
 			break;
@@ -73,11 +79,13 @@ class Bullet extends THREE.Object3D {
 		
 	}
 	
-	update(distance,duration,isBoy) {
+	update(distance,duration,world,isBoy) {
 		const scope = this;
 		TweenMax.to(scope.position, duration,{
 			z : distance,
 			onUpdate: function() {
+				const collide = scope.raycaster.intersectObjects(world.scene.children);
+				if(collide.length) console.log(collide);
 				if(isBoy) 
 				scope.children[0].rotation.y += Math.PI/12;
 				else
@@ -89,39 +97,37 @@ class Bullet extends THREE.Object3D {
 		}
 	}
 	
-	
 	updateForRose(distance,duration) {
 		const scope = this;
 		TweenMax.to(scope.children[0].position, duration,{
 			z : distance,
 		});
 		TweenMax.to(scope.children[1].position, duration,{
-			z : distance * Math.sin(Math.PI/3),
-			x : distance * Math.cos(Math.PI/6)
+			z : distance * Math.sin(Math.PI/6),
+			x : distance * Math.cos(Math.PI/3)
 		});
 		TweenMax.to(scope.children[2].position, duration,{
-			z : distance * Math.sin(Math.PI/3),
-			x : - distance * Math.cos(-Math.PI/6)
+			z : distance * Math.sin(Math.PI/6),
+			x : - distance * Math.cos(-Math.PI/3)
 		});
 		
 	}
 	
-	animate() {
+	animate(world) {
 		switch(this.characterName) {
 			case 'raby':
-				this.update(0.6,1.9);
+				this.update(0.7,1.3,world);
 			break;
 			case 'robo':
-				this.update(0.3,0.22);
+				this.update(0.3,0.22,world);
 			break;
 			case 'rose':
-				this.updateForRose(0.6,1.2)
+				this.updateForRose(1.5,2.2)
 			break;
 			case 'boy':
-				this.update(0.5,1.86,true);
+				this.update(0.6,1.2,world,true);
 			break;	
 			default:
-			
 			break;
 		}
 	

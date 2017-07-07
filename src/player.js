@@ -6,7 +6,7 @@ import HPBar from './hpbar';
 class Player {
 	constructor(data,preloader){
 		this.id = data.id;
-		this.hp = data.hp
+		this.hp = data.hp;
 		this.hpMax = data.hpMax;
 		this.position = data.position;
 		this.angle = data.angle;
@@ -42,20 +42,28 @@ class Player {
 			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);
-		this.hpBar = new HPBar(this.hp,this.hpMax,this.id);
+		this.hpBar = new HPBar(this.hp,this.hpMax);
+		switch(data.characterName) {
+			case 'raby':
+			this.hpBar.position.set(-0.02,.25,0);
+			break;
+			case 'robo':
+			this.hpBar.position.set(-0.044,.25,0);
+			break;
+			case 'rose':
+			this.hpBar.position.set(-0.032,.25,0.08);
+			break;
+			case 'boy':
+			this.hpBar.position.set(-0.046,.27,0.05);
+			default:
+			break;
+		}
+		this.character.mesh.add(this.hpBar);
 	}
 	
 	addToScene(world) {
 		this.character.mesh.position.set(this.position.x,this.position.y,this.position.z);
 		world.scene.add(this.character.mesh);
-	}
-	
-	initHPBar(world) {
-		this.hpBar.init(this.position,world);
-	}
-	
-	updateHPBar(hp,position,world) {
-		this.hpBar.updateHp(hp,position,world);
 	}
 	
 	animateCamera(data) {
@@ -70,6 +78,11 @@ class Player {
 			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);
+	}
+	
+	updateHPBar(hp,camera) {
+		this.hpBar.rotation.setFromRotationMatrix( camera.matrix );
+		this.hpBar.update(hp);
 	}
 	
 	animate() {

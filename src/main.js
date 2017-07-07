@@ -98,7 +98,7 @@
 		const stick = new Stick();
 		stick.init(socket);
 		
-		gameScene.updatePlayers(socket);
+		gameScene.updatePlayers(socket,world);
 		
 	}
 	
@@ -134,7 +134,7 @@
 		
 		selectScene && selectScene.animate();
 		
-		gameScene && gameScene.animate();
+		gameScene && gameScene.animate(world);
 		
 		
 		

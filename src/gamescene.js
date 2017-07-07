@@ -162,7 +162,6 @@ class GameScene extends THREE.Scene {
 				
 					scope.players[initPack[i].id] = player;
 					
-					player.initHPBar(world);
 					player.character.rotate(initPack[i]);
 					//because move is false = = !so we should directly update position
 					player.character.mesh.position.x = initPack[i].position.x;
@@ -186,7 +185,7 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						player.character.attack(initPack[i]);
+						player.character.attack(initPack[i],world);
 						socket.emit('attack',false);
 					}
 					
@@ -201,13 +200,12 @@ class GameScene extends THREE.Scene {
 			if(initPack.length) {
 				for(let i = 0; i < initPack.length; i++){
 					
-					scope.players[initPack[i].id].hpBar.dispose();
 					delete scope.players[initPack[i].id];
 					world.scene.children.forEach((model) => {
 						if(model instanceof THREE.SkinnedMesh) {
 							if(model.userData.id == initPack[i].id)
 							world.scene.remove(model);
-							Util.disposeNode(model);
+							Util.disposeHierarchy(model);
 						}
 					});
 				}
@@ -267,9 +265,13 @@ class GameScene extends THREE.Scene {
 	
 	}
 	
-	updatePlayers(socket) {
+	updatePlayers(socket,world) {
 		const scope = this;
 		socket.on('update',(data) => {
+			
+			const yourPlayer = scope.players[scope.yourId];
+			const yourPack = scope.yourPack;
+			if(yourPack && yourPlayer) yourPlayer.animateCamera(yourPack);
 			
 			for(let i = 0; i < data.length; i++){
 				
@@ -281,7 +283,8 @@ class GameScene extends THREE.Scene {
 					
 					const character = scope.players[eachId].character;
 					const player = scope.players[eachId];
-				
+					
+					player.updateHPBar(data[i].hp,scope.yourPlayer.camera);
 					character.rotate(data[i]);
 					character.updatePos(data[i]);
 									
@@ -302,17 +305,12 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						character.attack(data[i]);
+						character.attack(data[i],world);
 						socket.emit('attack',false);
 					}
 					
 				}
 			}
-			
-			const yourPlayer = scope.players[scope.yourId];
-			const yourPack = scope.yourPack;
-			if(yourPack && yourPlayer) yourPlayer.animateCamera(yourPack);
-			
 			
 		});
 		
