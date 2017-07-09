@@ -11,6 +11,8 @@ class Player extends Entity {
 		this.attack = false;
 		this.idle = true;
 		this.run = false;
+		this.vanish = false;
+		this.touch = false;
 	}
 	
 	update() {
@@ -41,7 +43,9 @@ class Player extends Entity {
 			angle : this.angle,
 			attack :this.attack,
 			idle : true,
-			run : this.run
+			run : this.run,
+			vanish: this.vanish,
+			touch : this.touch
 		}
 	}
 	
@@ -55,12 +59,10 @@ class Player extends Entity {
 			move : this.move,
 			attack :this.attack,
 			idle : this.idle,
-			run : this.run
+			run : this.run,
+			vanish: this.vanish,
+			touch : this.touch
 		}
-	}
-	
-	getRemovePack() {
-		//todo
 	}
 	
 	static getAllInitPack(playerList) {
@@ -103,8 +105,37 @@ class Player extends Entity {
 			scope.move = false;
 		});
 		
+		socket.on('touchstart',function() {
+			scope.touch = true;
+		});
+		
+		socket.on('touchend',function() {
+			scope.touch = false;
+		});
+		
+		socket.on('vanish',function() {
+			scope.vanish = true;
+		});
+		
+		socket.on('real',function() {
+			scope.vanish = false;
+		});
+		
+		
 		socket.on('gamestart',function() {
 			console.log('gamestart');
+		});
+		
+		socket.on('updateHP', (id) => {
+			console.log(id);
+			for( let i in playerList ) {
+				if( i == id ) {
+					if(playerList[i].hp > 0) 
+					playerList[i].hp -= 5;
+					else
+					delete playerList[id];
+				}
+			}
 		});
 		
 		const initPack = Player.getAllInitPack(playerList);

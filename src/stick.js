@@ -1,5 +1,6 @@
 import nipplejs from 'nipplejs';
 import Emitter from './emitter';
+import { TweenMax } from 'gsap';
 
 class Stick {
 	construtor() {
@@ -17,7 +18,7 @@ class Stick {
 		    multitouch: false,
 		    maxNumberOfNipples: 1,     
 		    dataOnly: false,             
-		    position: {bottom:'90px',left:'90px'},           
+		    position: {bottom:'90px',left:'90px'},         
 		    mode: 'static',                  
 		    restOpacity: 0.5,
 		});
@@ -31,9 +32,10 @@ class Stick {
 	    	//change angle has nothing to do with character's action
 	    });
 	    
-	    stick.on('start', function (evt) {
+	    stick.on('start', function () {
 	    	//when start touch the stick , player is running
 	    	socket.emit('move');
+	    	socket.emit('touchstart');
 	    	
 	    	socket.emit('run',true);
 	    	socket.emit('idle',false);
@@ -43,6 +45,7 @@ class Stick {
 	    stick.on('end', function (evt) {
 	    	//when end touch ,player is idle
 	    	socket.emit('stop');
+	    	socket.emit('touchend');
 	    	
 	    	socket.emit('idle',true);
 	    	socket.emit('run',false);
@@ -66,8 +69,33 @@ class Stick {
 	    	socket.emit('attack',true);
 	    }
 	    
+	     
 	    
 	}
+	
+	initRabySkill(socket) {
+		const vanish = document.getElementById('rabySkill');
+		const mask = document.getElementById('mask');
+		vanish.style.display = 'block';
+		vanish.onclick = function() {
+			socket.emit('vanish');
+			mask.style.height = '40px';
+			TweenMax.to(mask, 20,{ height : 0 });
+			setTimeout(function() {
+				socket.emit('real');
+			},8000);
+		};
+		vanish.ontouchstart = function() {
+			socket.emit('vanish');
+			mask.style.height = '40px';
+			TweenMax.to(mask, 20,{ height : 0});
+			setTimeout(function() {
+				socket.emit('real');
+			},8000);
+		};
+		
+	}
+
 }
 
 export default Stick;

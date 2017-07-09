@@ -9,7 +9,6 @@ class Player {
 		this.hp = data.hp;
 		this.hpMax = data.hpMax;
 		this.position = data.position;
-		this.angle = data.angle;
 		this.characterName = data.characterName;
 		
 		this.character = (function(data) {
@@ -42,6 +41,7 @@ class Player {
 			this.characterPos.z + 1,
 		);
 		this.camera.lookAt(this.characterPos);
+		
 		this.hpBar = new HPBar(this.hp,this.hpMax);
 		switch(data.characterName) {
 			case 'raby':
@@ -67,17 +67,19 @@ class Player {
 	}
 	
 	animateCamera(data) {
-		this.characterPos = {
-			x : data.position.x,
-			y : data.position.y,
-			z : data.position.z,
-		};
-		this.camera.position.set(
-			this.characterPos.x,
-			this.characterPos.y + 0.8,
-			this.characterPos.z + 1,
-		);
-		this.camera.lookAt(this.characterPos);
+		if(this.character.attackFinished) {
+			this.characterPos = {
+				x : data.position.x,
+				y : data.position.y,
+				z : data.position.z,
+			};
+			this.camera.position.set(
+				this.characterPos.x,
+				this.characterPos.y + 0.8,
+				this.characterPos.z + 1,
+			);
+			this.camera.lookAt(this.characterPos);
+		}
 	}
 	
 	updateHPBar(hp,camera) {

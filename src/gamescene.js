@@ -1,7 +1,9 @@
 import * as THREE from 'three';
+import Emitter from './emitter';
 import Player from './player';
 import Util from './util';
 import Stage from './stage';
+import { TweenMax } from 'gsap';
 
 class GameScene extends THREE.Scene {
 	constructor(preloader) {
@@ -171,10 +173,12 @@ class GameScene extends THREE.Scene {
 					player.character._$run = initPack[i].run;
 					player.character._$idle = initPack[i].idle;
 					player.character._$attack = initPack[i].attack;
+					player.character._$vanish = initPack[i].vanish;
 				
 					const isRun = player.character._$run;
 					const isIdle = player.character._$idle;
 					const isAttack = player.character._$attack;
+					const isVanish = player.character._$vanish;
 					
 					if(isRun)  {
 						player.character.run();
@@ -185,8 +189,20 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						player.character.attack(initPack[i],world);
+						player.character.attack(initPack[i],world,socket);
 						socket.emit('attack',false);
+					}
+					
+					if(isVanish) {
+						player.character.vanish();
+						player.hpBar.children[0].material.visible = false;
+						player.hpBar.children[1].material.visible = false;
+					}
+					
+					if(!isVanish) {
+						player.character.show();
+						player.hpBar.children[0].material.visible = true;
+						player.hpBar.children[1].material.visible = true;
 					}
 					
 					player.addToScene(world);
@@ -265,8 +281,9 @@ class GameScene extends THREE.Scene {
 	
 	}
 	
-	updatePlayers(socket,world) {
+	updatePlayers(socket,world,characterName) {
 		const scope = this;
+		
 		socket.on('update',(data) => {
 			
 			const yourPlayer = scope.players[scope.yourId];
@@ -284,17 +301,23 @@ class GameScene extends THREE.Scene {
 					const character = scope.players[eachId].character;
 					const player = scope.players[eachId];
 					
+					if(scope.yourPlayer)
 					player.updateHPBar(data[i].hp,scope.yourPlayer.camera);
+					else
+					Emitter.emit('gameover');
+					
 					character.rotate(data[i]);
 					character.updatePos(data[i]);
 									
 					character._$run = data[i].run;
 					character._$idle = data[i].idle;
 					character._$attack = data[i].attack;
+					character._$vanish = data[i].vanish;
 				
 					const isRun = character._$run;
 					const isIdle = character._$idle;
 					const isAttack = character._$attack;
+					const isVanish = character._$vanish;
 					
 					if(isRun)  {
 						character.run();
@@ -305,9 +328,21 @@ class GameScene extends THREE.Scene {
 						socket.emit('idle',false);
 					}
 					if(isAttack) {
-						character.attack(data[i],world);
+						character.attack(data[i],world,socket);
 						socket.emit('attack',false);
 					}
+					if(isVanish) {
+						character.vanish();
+						player.hpBar.children[0].material.visible = false;
+						player.hpBar.children[1].material.visible = false;
+					}
+					
+					if(!isVanish) {
+						character.show();
+						player.hpBar.children[0].material.visible = true;
+						player.hpBar.children[1].material.visible = true;
+					}
+						
 					
 				}
 			}

@@ -12,7 +12,6 @@ class Bullet extends THREE.Object3D {
 		//this.position = data.position;
 		this.pos = data.position;
 		this.angle = data.angle;
-		this.deg = 0;
 		switch(this.characterName) {
 			case 'raby':
 				const rabyBullet = new THREE.Mesh(
@@ -21,11 +20,6 @@ class Bullet extends THREE.Object3D {
 				);
 				rabyBullet.geometry.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI/4));
 				rabyBullet.position.set(-0.025,0.12,0.13);
-				const pos = new THREE.Vector3(this.pos.x,this.pos.y,this.pos.z);
-				console.log(pos);
-				this.raycaster = new THREE.Raycaster( pos.add(new THREE.Vector3(-0.025,0.12,0.13)) ,new THREE.Vector3(0,-1,0),0,0.025);
-				const arrowHelper = new THREE.ArrowHelper( new THREE.Vector3(0,0,1), new THREE.Vector3(0.025,0,0), 0.5, 0xff0000 );
-				rabyBullet.add( arrowHelper );
 				this.add(rabyBullet);
 				this.name = 'rabyBullet';
 			break;
@@ -79,17 +73,22 @@ class Bullet extends THREE.Object3D {
 		
 	}
 	
-	update(distance,duration,world,isBoy) {
+	update(distance,duration,world,socket,isBoy) {
 		const scope = this;
+		if(isBoy)
+		TweenMax.to(scope.position, duration,{
+			bezier:[{z:distance},{z:-0.01}],
+			onUpdate: function() {
+				scope.children[0].rotation.y += Math.PI/6;
+				scope.cast(world,socket,0);
+			},
+		});
+		else
 		TweenMax.to(scope.position, duration,{
 			z : distance,
 			onUpdate: function() {
-				const collide = scope.raycaster.intersectObjects(world.scene.children);
-				if(collide.length) console.log(collide);
-				if(isBoy) 
-				scope.children[0].rotation.y += Math.PI/12;
-				else
 				scope.children[0].rotation.z += Math.PI/12;
+				scope.cast(world,socket,0);				
 			},
 		});
 		function toRad(deg){
@@ -97,35 +96,68 @@ class Bullet extends THREE.Object3D {
 		}
 	}
 	
-	updateForRose(distance,duration) {
+	updateForRose(distance,duration,world,socket) {
 		const scope = this;
 		TweenMax.to(scope.children[0].position, duration,{
 			z : distance,
+			onUpdate: function() {
+				scope.cast(world,socket,0);				
+			},
 		});
 		TweenMax.to(scope.children[1].position, duration,{
 			z : distance * Math.sin(Math.PI/6),
-			x : distance * Math.cos(Math.PI/3)
+			x : distance * Math.cos(Math.PI/3),
+			onUpdate: function() {
+				scope.cast(world,socket,1);				
+			},
 		});
 		TweenMax.to(scope.children[2].position, duration,{
 			z : distance * Math.sin(Math.PI/6),
-			x : - distance * Math.cos(-Math.PI/3)
+			x : - distance * Math.cos(-Math.PI/3),
+			onUpdate: function() {
+				scope.cast(world,socket,2);		
+			},
 		});
 		
 	}
 	
-	animate(world) {
+	cast(world,socket,id) {
+		world.scene.updateMatrixWorld();
+		this.updateMatrixWorld();
+		const vector = new THREE.Vector3();
+		vector.setFromMatrixPosition( this.children[id].matrixWorld );
+		const raycaster = new THREE.Raycaster(vector,new THREE.Vector3(0,1,0));
+		const collide = raycaster.intersectObjects(world.scene.children,true);
+		const hit = collide.length;
+		if(hit) this.handleCollide(collide,world,socket);
+	}
+	
+	handleCollide(collide,world,socket) {
+		for(var i = 0; i < collide.length;i ++){
+			if(collide[i].object instanceof THREE.SkinnedMesh) {
+				if(collide[i].object.userData.hp <= 0) {
+					world.scene.remove(collide[i].object);
+					Util.disposeHierarchy(collide[i].object);
+				}
+				socket.emit('updateHP',collide[i].object.userData.id);
+			}
+		}	
+	}	
+		
+	
+	animate(world,socket) {
 		switch(this.characterName) {
 			case 'raby':
-				this.update(0.7,1.3,world);
+				this.update(1.2,1.3,world,socket);
 			break;
 			case 'robo':
-				this.update(0.3,0.22,world);
+				this.update(1.0,0.22,world,socket);
 			break;
 			case 'rose':
-				this.updateForRose(1.5,2.2)
+				this.updateForRose(1.5,2.2,world,socket);
 			break;
 			case 'boy':
-				this.update(0.6,1.2,world,true);
+				this.update(1.1,1.2,world,socket,true);
 			break;	
 			default:
 			break;

@@ -82,17 +82,36 @@
 			width: 300px;
 			height: 150px;
 		}
-		.hpBox{
+		#gameover{
 			position: absolute;
-			width: 50px;
-			height: 10px;
-			border: 2px solid black;
+			left: 50%;
+			top: 50%;
+			font-size: 30px;
+			font-family: "微软雅黑";
+			color: #444;
+			white-space: nowrap;
+			margin: -20px 0 0 -183px;
+			display: none;
 		}
-		.hp{
+		#rabySkill{
 			position: absolute;
-			width: 50px;
-			height: 10px;
-			background-color: red;
+			bottom: 32px;
+			right: 144px;
+			width: 40px;
+			height: 40px;
+			border: 2px solid #6c6c6c;
+			border-radius: 2px;
+			background : url(/img/vanish.png);
+			background-size: cover;
+			overflow: hidden;
+			display: none;
+		}
+		#mask{
+			position: absolute;
+			width: 40px;
+			height: 0px;
+			background-color: black;
+			opacity: 0.4;
 		}
 	</style>
 	<body>
@@ -103,5 +122,11 @@
 		</div>
 		<div id="stickzone"></div>
 		<div id="attack"></div>
+		<div id="rabySkill">
+			<div id="mask"></div>
+		</div>
+		<div id="gameover">
+			你被击败了,刷新重新开始吧
+		</div>
 	</body>
 </html>

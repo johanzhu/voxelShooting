@@ -84,7 +84,7 @@ class SelectScene extends THREE.Scene {
 			scope.boy.idle();
 			scope.raby.dance();
 			changeTitle(
-				'黑白兔Raby，能够隐身.确定选择她吗？','raby',socket
+				'黑白兔Raby，能够进入幽灵形态.确定选择她吗？','raby',socket
 			)
 		}
 		function chooseRobo() {
@@ -111,7 +111,7 @@ class SelectScene extends THREE.Scene {
 			scope.robo.idle();
 			scope.boy.dance();
 			changeTitle(
-				'少年Bob,能够致盲敌人.确定选择他吗？','boy',socket
+				'少年Bob,能够发射回旋镖.确定选择他吗？','boy',socket
 			)
 		}
 		
@@ -123,12 +123,12 @@ class SelectScene extends THREE.Scene {
 			
 			yes.onclick = function() {
 				title.style.display = 'none';
-				Emitter.emit('gamestart');
+				Emitter.emit('gamestart',characterName);
 				socket.emit('addPlayer',characterName);
 			}
 			yes.ontouchstart = function() {
 				title.style.display = 'none';
-				Emitter.emit('gamestart');
+				Emitter.emit('gamestart',characterName);
 				socket.emit('addPlayer',characterName);
 			}
 		}

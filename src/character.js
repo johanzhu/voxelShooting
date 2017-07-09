@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Clock from './clock';
 import Bullet from './bullet';
 import Util from './util';
+import GlowShaderMaterial from './glowshadermaterial';
 
 class Character {
 	
@@ -17,7 +18,12 @@ class Character {
 		);
 		
 		if(data) this.mesh.name = data.characterName;
+		if(data) this.mesh.userData.hp = data.hp;
 		if(data) this.mesh.userData.id = data.id;
+		
+		if(data && data.characterName == 'raby')
+		this.vanishMat = GlowShaderMaterial();
+		
 		this.mesh.castShadow = true;
 		this.clock = new Clock(true);
 		
@@ -43,15 +49,11 @@ class Character {
 		
 		if(data) this._$idle = data.idle;
 		
-		if(data) this.position = data.position;
+		if(data) this._$vanish = data.vanish;
 		
-		if(data) this.move = data.move;
+		if(data) this._$touch = data.touch;
 		
 		if(data) this.characterName = data.characterName;
-		
-		if(data) this.hp = data.hp;
-		
-		if(data) this.hpMax = data.hpMax;
 		
 		this.bullet = null;
 		
@@ -62,16 +64,15 @@ class Character {
 		
 	}
 	
-	attack(data,world) {
-		
+	attack(data,world,socket) {
+		const scope = this;
 		if(this._$attack) {
 			if(this.attackFinished) {
+				this.attackFinished = false;
 				//of course is finished . you are not attacking anyone;
 				this.reset();
 				
 				this._attack.play();
-				//when ation play attack not finish until ...
-				this.attackFinished = false;
 				
 				switch(data.characterName) {
 					case 'raby':
@@ -87,23 +88,29 @@ class Character {
 					this.attackDelay = 500;
 					break;
 				}
-				setTimeout(() => {
-					this.shoot(data,world);
-				},this.attackDelay);
+				
+				setTimeout(shoot,this.attackDelay);
+				
+				function shoot() {
+					scope.shoot(data,world,socket);
+				}
 				
 				//fade the action
 				this.mixer.addEventListener('finished',() => {
 					
 					this.attackFinished = true;
+					
 					if(this.bullet) {
 						this.mesh.remove(this.bullet);
 					}
 					
-					if(this._$run) {
-						this._attack.crossFadeTo(this._run,0.15,true);
+					if(data.touch) {
+						socket.emit('move');
+						this.reset();
 						this._run.play();
 					}else{
-						this._attack.crossFadeTo(this._idle,0.15,true);
+						socket.emit('stop');
+						this.reset();
 						this._idle.play();
 					}
 					
@@ -112,11 +119,11 @@ class Character {
 		}
 	}
 	
-	shoot(data,world) {
+	shoot(data,world,socket) {
 		const bullet = new Bullet(data);
 		this.bullet = bullet;
 		this.mesh.add(this.bullet);
-		bullet.animate(world);
+		bullet.animate(world,socket);
 	}
 	
 	idle() {
@@ -124,19 +131,24 @@ class Character {
 			this.reset();
 			this._idle.play();
 		}
-		if(this._$idle) {
-			this.reset();
-			this._idle.play();
+		if(this.bullet) {
+			this.mesh.remove(this.bullet);
+		}
+		if(this.attackFinished) {
+			if(this._$idle) {
+				this.reset();
+				this._idle.play();
+			}
 		}
 		
 	}
 	
 	run() {
-		this.attackFinished = true;
 		if(this.bullet) {
 			this.mesh.remove(this.bullet);
 		}
-		if(this._$run) {
+		
+		if(this.attackFinished && this._$run) {
 			this.reset();
 			this._run.play();
 		}
@@ -149,6 +161,14 @@ class Character {
 		this._dance.crossFadeFrom(this._idle,0.15,true);
 	}
 	
+	vanish() {
+		this.mesh.material = this.vanishMat;
+	}
+	
+	show() {
+		this.mesh.material = this.material;
+	}
+	
 	reset() {
     	this.mixer.stopAllAction();
     	for( let i=0; i < this.mesh.geometry.animations.length; i++) {
@@ -158,12 +178,13 @@ class Character {
 	
 	//character moving state
 	rotate(data) {
-		
-		const deg = data.angle;
-		if(deg == 0) {
-			this.mesh.rotation.y = 0;
-		}else{
-			this.mesh.rotation.y = toRad(deg + 90);
+		if(this.attackFinished) {
+			const deg = data.angle;
+			if(deg == 0) {
+				this.mesh.rotation.y = 0;
+			}else{
+				this.mesh.rotation.y = toRad(deg + 90);
+			}
 		}
 		
 		function toRad(deg){
@@ -172,7 +193,7 @@ class Character {
 	}
 	
 	updatePos(data) {
-		if(data.move) {
+		if(this.attackFinished) {
 			this.mesh.position.x = data.position.x;
 			this.mesh.position.z = data.position.z;
 		}

@@ -26,7 +26,11 @@
 		
 		initSelectScene();
 		
-		Emitter.on('gamestart',initGameScene);
+		Emitter.on('gamestart',function(characterName) {
+			initGameScene(characterName);
+		});
+		
+		Emitter.on('gameover',initGameoverScene);
 		
 		animate();
 		
@@ -80,28 +84,39 @@
 		
 	}
 	
-	function initGameScene() {
-		
+	function initGameScene(characterName) {
 		gameScene = new GameScene(preloader);
 		gameScene.init();
 		
 		selectScene.dispose(world);
 		
-		//change gb color to be same with the stage
 		const bg = document.getElementById('world');
 		bg.style.backgroundColor = '#D6D6D6';
 		
-		//change scene
+		//we also change scene here
 		gameScene.showAndGenPlayer(world,preloader,socket);
 		
-		//init stick bar
 		const stick = new Stick();
 		stick.init(socket);
 		
-		gameScene.updatePlayers(socket,world);
+		if(characterName == 'raby') {
+			stick.initRabySkill(socket);
+		}
+		
+		gameScene.updatePlayers(socket,world,characterName);
 		
 	}
 	
+	function initGameoverScene() {
+		
+		const world = document.getElementById('world');
+		world.style.display = 'none';
+		const gameover = document.getElementById('gameover');
+		gameover.style.display = 'block';
+		const rabySkill = document.getElementById('rabySkill');
+		rabySkill.style.display = 'none';
+		
+	}
 	
 	function onProgress() {
 		var percent = preloader.progress;
@@ -134,7 +149,7 @@
 		
 		selectScene && selectScene.animate();
 		
-		gameScene && gameScene.animate(world);
+		gameScene && gameScene.animate();
 		
 		
 		
