@@ -55,7 +55,10 @@ class Character {
 		
 		if(data) this.characterName = data.characterName;
 		
-		this.bullet = null;
+		if(data) {
+			const bullet = new Bullet(data);
+			this.bullet = bullet;
+		}
 		
 		this.attackFinished = true;
 		this.attackDelay = 0;
@@ -89,20 +92,15 @@ class Character {
 					break;
 				}
 				
-				setTimeout(shoot,this.attackDelay);
+				setTimeout(function() {
+					scope.shoot(world,socket);
+				},this.attackDelay);
 				
-				function shoot() {
-					scope.shoot(data,world,socket);
-				}
 				
 				//fade the action
 				this.mixer.addEventListener('finished',() => {
 					
 					this.attackFinished = true;
-					
-					if(this.bullet) {
-						this.mesh.remove(this.bullet);
-					}
 					
 					if(data.touch) {
 						socket.emit('move');
@@ -119,11 +117,9 @@ class Character {
 		}
 	}
 	
-	shoot(data,world,socket) {
-		const bullet = new Bullet(data);
-		this.bullet = bullet;
+	shoot(world,socket) {
 		this.mesh.add(this.bullet);
-		bullet.animate(world,socket);
+		this.bullet.animate(world,socket,this.mesh);
 	}
 	
 	idle() {

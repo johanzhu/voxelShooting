@@ -1,8 +1,16 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
-a {
-  color: #00B7FF;
-}
+body,html{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background-color:#d2d2d2;font-family: "微软雅黑 ",'Arial';}
+#title{position:absolute;top:60px;color:#444;font-size:25px;white-space:nowrap;width:100%;text-align:center;left:0;display:none}
+#yes{position:absolute;top:110%;left:50%;content:'Yes';font-size:25px;color:green;border:2px #696969 solid;width:auto;padding:0 10px 3px 10px;border-radius:10px;margin-left:-32.43px;display:none}
+#yes:hover{background-color:#fff;cursor:pointer}
+#loading{position:absolute;width:200px;top:50%;left:50%;color:#444;font-size:40px;margin:-41px 0 0 -100px;text-align:center}
+#loadingBar{width:0;height:20px;background-color:#fff;margin-top:10px}
+#world{display:none}
+#attack{position:absolute;right:42px;bottom:42px;width:100px;height:100px;background-color:#000;border-radius:50%;opacity:.5;display:none}
+#stickzone{position:absolute;left:0;bottom:0;width:300px;height:150px}
+#gameover{position:absolute;left:50%;top:50%;font-size:30px;color:#444;white-space:nowrap;margin:-20px 0 0 -183px;display:none}
+#rabySkill{position:absolute;bottom:32px;right:144px;width:40px;height:40px;border:2px solid #6c6c6c;border-radius:2px;background:url(/img/vanish.png);background-size:cover;overflow:hidden;display:none}
+#mask{position:absolute;width:40px;height:0;background-color:#000;opacity:.4}
+#qr{width:100%;height:100%;text-align:center;position:absolute;top:0;font-size:30px;color:#444;z-index:5;background-color:#d3d3d3;display:none}
+#qr:after{display:inline-block;width:0;height:100%;vertical-align:middle;content:""}
+#landscape{width:100%;height:100%;text-align:center;position:absolute;top:0;font-size:30px;color:#444;z-index:5;background-color:#d3d3d3;display:none}
+#landscape:after{display:inline-block;width:0;height:100%;vertical-align:middle;content:""}

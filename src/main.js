@@ -12,13 +12,29 @@
 	
 	var world,
 		selectScene,
-		gameScene;
+		gameScene,
+		isLandscape;
+	var firstInit = true;
+	var isGameScene = false;
+	
 		
 	const socket = io();
 		
 	const preloader = new createjs.LoadQueue(true);
 	
-	loadAssets();
+	if(isMobile()) {
+		loadAssets();
+		Emitter.on('orientationChange',function(isLandscape) {
+			if(isLandscape)
+				showGamePage();
+			else
+				showTipPage();
+		});
+		
+	}else{
+		showQRPage();
+	}
+	
 	
 	function onComplete() {
 		
@@ -36,6 +52,20 @@
 		
 	}
 	
+	function showTipPage() {
+		show('landscape');
+		weakHide('stickzone');
+	}
+	
+	function showQRPage() {
+		show('qr');
+	}
+	
+	function showGamePage() {
+		hide('qr');
+		hide('landscape');
+		weakShow('stickzone');
+	}
 	
 	function initWorld() {
 		
@@ -85,6 +115,7 @@
 	}
 	
 	function initGameScene(characterName) {
+		isGameScene = true;
 		gameScene = new GameScene(preloader);
 		gameScene.init();
 		
@@ -127,6 +158,10 @@
 	
 	function loadAssets() {
 		
+		const loading = document.getElementById('loading');
+		
+		loading.style.display = 'block';
+		
 		preloader.on("complete", onComplete);
 		
 		preloader.on("progress", onProgress);
@@ -145,19 +180,53 @@
 		
 		requestAnimationFrame(animate);
 		
+		detectOrientation();
+		
 		world.render();
 		
 		selectScene && selectScene.animate();
 		
 		gameScene && gameScene.animate();
 		
-		
-		
+	}
+	
+	function detectOrientation() {
+		if (window.innerHeight > window.innerWidth){
+			Emitter.emit('orientationChange',false);
+		    isLandscape = false;
+		}else{
+			Emitter.emit('orientationChange',true);
+			isLandscape = true;
+		}
 	}
 	
 	
+	function isMobile() {
+		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+ 			return true;
+		}else{
+			return false
+		}
+	}
 	
+	function hide(id) {
+		const hideItem = document.getElementById(id);
+		hideItem.style.display = 'none';
+	}
 	
+	function show(id) {
+		const hideItem = document.getElementById(id);
+		hideItem.style.display = 'block';
+	}
+
+	function weakHide(id) {
+		const hideItem = document.getElementById(id);
+		hideItem.style.opacity = '0';
+	}
 	
+	function weakShow(id) {
+		const hideItem = document.getElementById(id);
+		hideItem.style.opacity = '1';
+	}
 	
-			
+	window.ontouchstart = function(e) { e.preventDefault(); };

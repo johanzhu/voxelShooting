@@ -18,10 +18,6 @@ class World {
 	init() {
 		const that = this;
 		
-		const world = document.createElement('div');
-		world.setAttribute('id','world');
-		document.body.appendChild(world);
-	
 		this.renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
 		this.renderer.setSize(window.innerWidth,window.innerHeight);
 		this.renderer.setPixelRatio(1.5);

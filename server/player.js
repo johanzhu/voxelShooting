@@ -127,7 +127,6 @@ class Player extends Entity {
 		});
 		
 		socket.on('updateHP', (id) => {
-			console.log(id);
 			for( let i in playerList ) {
 				if( i == id ) {
 					if(playerList[i].hp > 0) 

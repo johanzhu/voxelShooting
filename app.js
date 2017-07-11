@@ -87,6 +87,7 @@ io.on('connection',function(socket){
 	});
 	
 	socket.on('disconnect',function() {
+		console.log('socket disconnection!')
 		delete playerList[socket.id];
 	});
 	

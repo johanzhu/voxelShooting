@@ -78,17 +78,23 @@ class Stick {
 		const mask = document.getElementById('mask');
 		vanish.style.display = 'block';
 		vanish.onclick = function() {
+			vanish.style.pointerEvents = 'none';
 			socket.emit('vanish');
 			mask.style.height = '40px';
-			TweenMax.to(mask, 20,{ height : 0 });
+			TweenMax.to(mask, 20,{ height : 0,onComplete:function() {
+				vanish.style.pointerEvents = 'auto';
+			}});
 			setTimeout(function() {
 				socket.emit('real');
 			},8000);
 		};
 		vanish.ontouchstart = function() {
+			vanish.style.pointerEvents = 'none';
 			socket.emit('vanish');
 			mask.style.height = '40px';
-			TweenMax.to(mask, 20,{ height : 0});
+			TweenMax.to(mask, 20,{ height : 0,onComplete:function() {
+				vanish.style.pointerEvents = 'auto';
+			}});
 			setTimeout(function() {
 				socket.emit('real');
 			},8000);
