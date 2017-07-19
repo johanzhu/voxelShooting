@@ -18,7 +18,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new HtmlWebpackPlugin({
+    /*new HtmlWebpackPlugin({
       template: path.resolve(__dirname + '/views/index.html'),
       inject: 'body',
       filename: 'index.html'
@@ -27,7 +27,7 @@ module.exports = {
       compress: {
         warnings: false
       }
-    })
+    })*/
   ],
   module: {
   rules: [
