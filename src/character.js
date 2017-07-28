@@ -98,21 +98,26 @@ class Character {
 				
 				
 				//fade the action
-				this.mixer.addEventListener('finished',() => {
-					
-					this.attackFinished = true;
+				this.mixer.addEventListener('finished',hanldeAttackFinish);
+				
+				function hanldeAttackFinish() {
+					scope.attackFinished = true;
 					
 					if(data.touch) {
 						socket.emit('move');
-						this.reset();
-						this._run.play();
+						scope.reset();
+						scope._run.play();
+						scope.mixer.removeEventListener('finished',hanldeAttackFinish);
 					}else{
 						socket.emit('stop');
-						this.reset();
-						this._idle.play();
+						scope.reset();
+						scope._idle.play();
+						scope.mixer.removeEventListener('finished',hanldeAttackFinish);
 					}
-					
-				});
+				}
+				
+				
+				
 			}
 		}
 	}

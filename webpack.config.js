@@ -17,17 +17,17 @@ module.exports = {
         }
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    /*new HtmlWebpackPlugin({
+    /*new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
       template: path.resolve(__dirname + '/views/index.html'),
       inject: 'body',
       filename: 'index.html'
-    }),
+    }),*/
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
       }
-    })*/
+    })
   ],
   module: {
   rules: [
